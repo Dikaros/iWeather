@@ -1,20 +1,34 @@
 package com.guohui.weather;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapRegionDecoder;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.dikaros.simplifyfindwidget.SimpifyUtil;
 import com.dikaros.simplifyfindwidget.annotation.FindView;
+import com.guohui.weather.util.Util;
 import com.guohui.weather.view.CustomScrollView;
 import com.guohui.weather.view.DailyForecastView;
 import com.guohui.weather.view.HourlyForecastView;
+import com.guohui.weather.view.InnerScrollView;
 
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -34,8 +48,8 @@ public class MainActivity extends AppCompatActivity {
     TextView tvCurrentTempUnit;
 
     //横向的滑动条，分时段显示当天天气
-    @FindView(R.id.hsv_weather_by_hour)
-    HorizontalScrollView hsvWeatherByHour;
+    @FindView(R.id.rl_weather_by_hour)
+    RelativeLayout rlWeatherByHour;
 
     @FindView(R.id.rl_today_temp_mess)
     RelativeLayout rlTodayTempMess;
@@ -45,6 +59,20 @@ public class MainActivity extends AppCompatActivity {
 
     @FindView(R.id.ll_weather_hourly)
     LinearLayout llWeatherHourly;
+
+    @FindView(R.id.iv_hourly_back)
+    ImageView ivHourly;
+
+    @FindView(R.id.view_blank)
+    View viewBlank;
+
+    @FindView(R.id.sv_more)
+    InnerScrollView svMore;
+
+
+    @FindView(R.id.view_hourly_blank)
+    View viewHourlyBlank;
+
 
     //主ScrollView滑动的距离
     int mainScrollY;
@@ -81,18 +109,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void initWeatherForcast() {
 
-        for (int i=1;i<=7;i++){
-            llWeatherForcast.addView(new DailyForecastView(this,"星期"+i,(20+i)+"",(20-i)+"").getView());
+        for (int i = 1; i <= 7; i++) {
+            llWeatherForcast.addView(new DailyForecastView(this, "星期" + i, (20 + i) + "", (20 - i) + "").getView());
         }
 
         //增加小时播报
-        for (int i=0;i<24;i++){
+        for (int i = 0; i < 24; i++) {
 
 //            llWeatherForcast.addView(new DailyForecastView(this,"星期"+i,(20+i)+"",(20-i)+"").getView());
-            if (i==0){
-                llWeatherHourly.addView(new HourlyForecastView(this,"现在",20-i+"°").getView());
+            if (i == 0) {
+                llWeatherHourly.addView(new HourlyForecastView(this, "现在", 20 - i + "°").getView());
 
-            }else {
+            } else {
 
                 llWeatherHourly.addView(new HourlyForecastView(this, String.format("%02d:00", (calendar.get(Calendar.HOUR_OF_DAY) + i) % 24), 20 - i + "°").getView());
             }
@@ -118,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
     //主scroll的绝对位置
     float absoluteMainScrollY;
 
-    float startHsvY=-1;
+    float startHsvY = -1;
 
 
     /**
@@ -139,6 +167,9 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         initLocation();
 
+
+
+
     }
 
 
@@ -146,11 +177,22 @@ public class MainActivity extends AppCompatActivity {
      * 加载滑动布局
      */
     private void initScrollView() {
+        svMore.setParentScrollView(svMain);
+        svMain.setIntercept(true);
+
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        layoutParams.setMargins(0, Util.sp2px(this,18)+Util.dip2px(this,140+96), 0, 0);
+        rlWeatherByHour.setLayoutParams(layoutParams);
+
         svMain.setScrollChangedCallback(new CustomScrollView.OnScrollChangedCallback() {
             @Override
             public void onScrollChanged(CustomScrollView scrollView, int x, int y, int oldX, int oldY) {
-                if (startHsvY==-1){
-                    startHsvY = hsvWeatherByHour.getY();
+
+                ((RelativeLayout.LayoutParams)rlWeatherByHour.getLayoutParams()).setMargins(0,0,0,0);
+//                svMore.
+                if (startHsvY == -1) {
+                    startHsvY = viewHourlyBlank.getY();
                 }
                 absoluteMainScrollY = scrollView.getY();
                 mainScrollY = scrollView.getScrollY();
@@ -190,23 +232,57 @@ public class MainActivity extends AppCompatActivity {
                 当水平栏滑动到主滑动栏位置的时候
                 停止其随着主滑动栏的滑动而滑动
                  */
-//                hsvWeatherByHour.getLocationOnScreen(location);
-//                int hsv1= location[1];
-                if (mainScrollY>startHsvY){
-                    hsvWeatherByHour.setY(mainScrollY);
+                viewHourlyBlank.getLocationOnScreen(location);
+
+
+                int left = location[0];
+                int top = location[1];
+
+
+                if (mainScrollY > startHsvY) {
+                    viewHourlyBlank.setY(mainScrollY);
+                    if (!seted) {
+//                        setImageRegion(ivHourly, left, top);
+//                        ivHourly.setImageResource(R.drawable.sun);
+//                        viewBlank.setVisibility(View.GONE);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getWindowManager().getDefaultDisplay().getHeight() - top - rlWeatherByHour.getHeight());
+                        svMore.setLayoutParams(params);
+                        seted = true;
+                        svMain.setIntercept(false);
+
+                        svMore.setY(startHsvY + viewHourlyBlank.getHeight());
+                    }
+                } else {
+                    ivHourly.setImageBitmap(null);
+                    viewBlank.setVisibility(View.VISIBLE);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getWindowManager().getDefaultDisplay().getHeight() - top);
+                    svMore.setLayoutParams(params);
+                    seted = false;
+                    svMain.setIntercept(true);
                 }
 
-                if (mainScrollY==0){
-                    hsvWeatherByHour.setY(startHsvY);
+                if (mainScrollY == 0) {
+                    viewHourlyBlank.setY(startHsvY);
                 }
-//                    hsvWeatherByHour.setY(absoluteMainScrollY);
-//                hsvWeatherByHour.scrollTo(0,100);
-//                hsvWeatherByHour.setY(100);
+//                    rlWeatherByHour.setY(absoluteMainScrollY);
+//                rlWeatherByHour.scrollTo(0,100);
+//                rlWeatherByHour.setY(100);
+//                setImageRegion(rlWeatherByHour,left,top);
+
+                viewHourlyBlank.getLocationOnScreen(location);
+
+
+                int new2 = location[1];
+
+                rlWeatherByHour.setY(new2);
+
                 lastMainScrollY = mainScrollY;
 
             }
         });
     }
+
+    boolean seted = false;
 
     /**
      * 加载window，以实现沉浸式状态栏
@@ -217,4 +293,6 @@ public class MainActivity extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
     }
+
+
 }

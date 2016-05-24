@@ -3,6 +3,8 @@ package com.guohui.weather.view;
 import android.content.Context;
 import android.content.pm.LauncherApps;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.ScrollView;
 
 /**
@@ -28,6 +30,7 @@ public class CustomScrollView extends ScrollView {
 
     /**
      * 设置回调对象
+     *
      * @param scrollChangedCallback 回调对象
      */
     public void setScrollChangedCallback(OnScrollChangedCallback scrollChangedCallback) {
@@ -39,8 +42,8 @@ public class CustomScrollView extends ScrollView {
         super.onScrollChanged(l, t, oldl, oldt);
 
         //如果callback不为空则调用其中的方法
-        if (scrollChangedCallback!=null){
-            scrollChangedCallback.onScrollChanged(this,l,t,oldl,oldt);
+        if (scrollChangedCallback != null) {
+            scrollChangedCallback.onScrollChanged(this, l, t, oldl, oldt);
         }
 
     }
@@ -51,4 +54,26 @@ public class CustomScrollView extends ScrollView {
     public interface OnScrollChangedCallback {
         public void onScrollChanged(CustomScrollView scrollView, int x, int y, int oldX, int oldY);
     }
+
+    boolean intercept = false;
+
+
+    public void setIntercept(boolean intercept) {
+        this.intercept = intercept;
+    }
+
+    float lastX;
+    float lastY;
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (intercept) {
+
+            return intercept;
+        }
+
+        return super.onInterceptTouchEvent(ev);
+    }
+
+
 }

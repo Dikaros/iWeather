@@ -47,6 +47,7 @@ public class SimpifyUtil {
 
                     } else {
                         newView = fieldType.cast(view.findViewById(fv.value()));
+                        Log.i("simply",fv.value()+"");
                     }
 
                     if (newView == null) {
