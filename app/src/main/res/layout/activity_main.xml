@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/sun"
+    android:id="@+id/rl_root"
+    android:background="@drawable/weather_thunder_storm"
     android:clipToPadding="true"
     android:fitsSystemWindows="true"
     tools:context="com.guohui.weather.MainActivity">
@@ -17,16 +18,16 @@
         android:layout_height="84dp"
         android:background="@color/transparent"
         android:gravity="center_horizontal"
+        android:paddingTop="25dp"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/tv_city_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
             android:text="长沙市"
             android:textColor="@color/white"
-            android:textSize="30sp" />
+            android:textSize="26sp" />
 
         <TextView
             android:id="@+id/tv_city_stat"
@@ -35,7 +36,7 @@
             android:layout_marginTop="2dp"
             android:text="晴天"
             android:textColor="@color/white"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
     </LinearLayout>
 
     <TextView

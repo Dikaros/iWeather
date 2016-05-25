@@ -3,6 +3,7 @@ package com.guohui.weather;
 import android.graphics.Bitmap;
 import android.graphics.BitmapRegionDecoder;
 import android.graphics.Rect;
+import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.LinearLayout;
@@ -20,8 +22,13 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.dikaros.asynet.AsyNet;
+import com.dikaros.asynet.NormalAsyNet;
 import com.dikaros.simplifyfindwidget.SimpifyUtil;
 import com.dikaros.simplifyfindwidget.annotation.FindView;
+import com.guohui.weather.bean.DailyForecast;
+import com.guohui.weather.bean.HourlyForecast;
+import com.guohui.weather.bean.Weather;
 import com.guohui.weather.util.Util;
 import com.guohui.weather.view.CustomScrollView;
 import com.guohui.weather.view.DailyForecastView;
@@ -73,6 +80,11 @@ public class MainActivity extends AppCompatActivity {
     @FindView(R.id.view_hourly_blank)
     View viewHourlyBlank;
 
+    @FindView(R.id.rl_root)
+    RelativeLayout rlRoot;
+
+    Weather currentWeather;
+
 
     //主ScrollView滑动的距离
     int mainScrollY;
@@ -85,14 +97,55 @@ public class MainActivity extends AppCompatActivity {
         //为声明的view findId
         SimpifyUtil.findAllViews(this);
 
+        //初始化日期
         initDate();
         //加载滑动布局
         initScrollView();
 
+        //初始化标题
         initTitleLayout();
 
+        //初始化天气预报
         initWeatherForcast();
 
+        //初始化动画效果
+        initAnimation();
+
+        NormalAsyNet net = new NormalAsyNet("http://apis.baidu.com/heweather/pro/weather?city=changsha", AsyNet.NetMethod.GET);
+        net.addHeader("apikey",Config.API_KEY);
+        net.setOnNetStateChangedListener(new AsyNet.OnNetStateChangedListener<String>() {
+            @Override
+            public void beforeAccessNet() {
+
+            }
+
+            @Override
+            public void afterAccessNet(String result) {
+                if (result!=null){
+//                    Log.e("result",result);
+                    currentWeather = new Weather(result);
+                    updateWeatherUi();
+
+                }
+            }
+
+            @Override
+            public void whenException() {
+
+            }
+
+            @Override
+            public void onProgress(Integer progress) {
+
+            }
+        });
+
+        net.execute();
+    }
+
+    private void initAnimation() {
+        AnimationDrawable d = (AnimationDrawable) rlRoot.getBackground();
+        d.start();
     }
 
     Calendar calendar;
@@ -107,24 +160,44 @@ public class MainActivity extends AppCompatActivity {
         calendar.setTime(currentTime);
     }
 
+    public void updateWeatherUi(){
+        initWeatherForcast();
+    }
+
     private void initWeatherForcast() {
 
-        for (int i = 1; i <= 7; i++) {
-            llWeatherForcast.addView(new DailyForecastView(this, "星期" + i, (20 + i) + "", (20 - i) + "").getView());
-        }
+        llWeatherHourly.removeAllViews();
+        llWeatherForcast.removeAllViews();
+        if (currentWeather ==null) {
+            for (int i = 1; i <= 7; i++) {
+                llWeatherForcast.addView(new DailyForecastView(this, "星期" + i, (20 + i) + "", (20 - i) + "").getView());
+            }
 
-        //增加小时播报
-        for (int i = 0; i < 24; i++) {
+            //增加小时播报
+            for (int i = 0; i < 24; i++) {
 
 //            llWeatherForcast.addView(new DailyForecastView(this,"星期"+i,(20+i)+"",(20-i)+"").getView());
-            if (i == 0) {
-                llWeatherHourly.addView(new HourlyForecastView(this, "现在", 20 - i + "°").getView());
+                if (i == 0) {
+                    llWeatherHourly.addView(new HourlyForecastView(this, "现在", 20 - i + "°").getView());
 
-            } else {
+                } else {
 
-                llWeatherHourly.addView(new HourlyForecastView(this, String.format("%02d:00", (calendar.get(Calendar.HOUR_OF_DAY) + i) % 24), 20 - i + "°").getView());
+                    llWeatherHourly.addView(new HourlyForecastView(this, String.format("%02d:00", (calendar.get(Calendar.HOUR_OF_DAY) + i) % 24), 20 - i + "°").getView());
+                }
+            }
+        }else {
+
+            for (int i=0;i<currentWeather.getDaily_forecast().size();i++){
+                DailyForecast f = currentWeather.getDaily_forecast().get(i);
+                llWeatherForcast.addView(new DailyForecastView(this,"星期"+(calendar.get(Calendar.DAY_OF_WEEK)+i)%7,f.getTmp().getMax(),f.getTmp().getMin()).getView());
+            }
+
+            for (int i=0;i<currentWeather.getHourly_forecast().size();i++){
+                HourlyForecast h = currentWeather.getHourly_forecast().get(i);
+                llWeatherHourly.addView(new HourlyForecastView(this,h.getDate().substring(h.getDate().length()-5,h.getDate().length()),h.getTmp()).getView());
             }
         }
+
     }
 
     /**
@@ -179,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
     private void initScrollView() {
         svMore.setParentScrollView(svMain);
         svMain.setIntercept(true);
-
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         layoutParams.setMargins(0, Util.sp2px(this,18)+Util.dip2px(this,140+96), 0, 0);
@@ -214,18 +286,23 @@ public class MainActivity extends AppCompatActivity {
                         rlTodayTempMess.setAlpha(alpha);
                         tvCurrentTemp.setAlpha(alpha);
                         tvCurrentTempUnit.setAlpha(alpha);
+                        llCityTitle.setPadding(0, (int) (Util.dip2px(MainActivity.this,15)+(Util.dip2px(MainActivity.this,10))*alpha),0,0);
                     }
                     //向上滑
                     else {
                         rlTodayTempMess.setAlpha(alpha);
                         tvCurrentTemp.setAlpha(alpha);
                         tvCurrentTempUnit.setAlpha(alpha);
+                        llCityTitle.setPadding(0, (int) (Util.dip2px(MainActivity.this,15)+(Util.dip2px(MainActivity.this,10))*alpha),0,0);
+
 
                     }
                 } else {
                     rlTodayTempMess.setAlpha(0);
                     tvCurrentTemp.setAlpha(0);
                     tvCurrentTempUnit.setAlpha(0);
+                    llCityTitle.setPadding(0, Util.dip2px(MainActivity.this,15),0,0);
+
                 }
 
                 /*

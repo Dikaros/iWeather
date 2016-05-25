@@ -32,7 +32,6 @@ public class SimpifyUtil {
             for (Field field : fields) {
                 //如果属性是view并且被FindView这个注解修饰的并且是view的子类
                 if (field.isAnnotationPresent(FindView.class)) {
-                    Log.d("SimplifyUtil", field.getName());
                     //成员变量类型
                     Class fieldType = field.getType();
 
@@ -47,7 +46,6 @@ public class SimpifyUtil {
 
                     } else {
                         newView = fieldType.cast(view.findViewById(fv.value()));
-                        Log.i("simply",fv.value()+"");
                     }
 
                     if (newView == null) {
@@ -97,7 +95,6 @@ public class SimpifyUtil {
             for (Field field : fields) {
                 //如果属性是view并且被FindView这个注解修饰的并且是view的子类
                 if (field.isAnnotationPresent(FindView.class)) {
-                    Log.d("SimplifyUtil", field.getName());
                     //成员变量类型
                     Class fieldType = field.getType();
 

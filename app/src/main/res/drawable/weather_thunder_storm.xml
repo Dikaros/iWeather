@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/weather_thunder_storm_0"
+        android:duration="500" />
+    <item
+        android:drawable="@drawable/weather_thunder_storm_1"
+        android:duration="1500" />
+
+    <item
+        android:drawable="@drawable/weather_thunder_storm_2"
+        android:duration="100" />
+
+    <item
+        android:drawable="@drawable/weather_thunder_storm_3"
+        android:duration="3000" />
+
+    <item
+        android:drawable="@drawable/weather_thunder_storm_4"
+        android:duration="80" />
+    <item
+        android:drawable="@drawable/weather_thunder_storm_5"
+        android:duration="5000" />
+
+</animation-list>
