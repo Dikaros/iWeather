@@ -150,7 +150,7 @@
             </RelativeLayout>
 
             <View
-                android:id="@+id/view_hourly_blank"
+                android:id="@+id/view_blank_hourly"
                 android:layout_width="match_parent"
                 android:layout_height="96dp"/>
             <!--其他滑动区域-->
@@ -220,8 +220,8 @@
                                 android:textSize="@dimen/default_text_size" />
 
                             <TextView
+                                android:id="@+id/tv_detail_sr"
                                 android:layout_width="0dp"
-
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
@@ -248,7 +248,7 @@
 
                             <TextView
                                 android:layout_width="0dp"
-
+                                android:id="@+id/tv_detail_ss"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
@@ -276,7 +276,7 @@
 
                             <TextView
                                 android:layout_width="0dp"
-
+                                android:id="@+id/tv_detail_pop"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
@@ -303,7 +303,7 @@
 
                             <TextView
                                 android:layout_width="0dp"
-
+                                android:id="@+id/tv_detail_hum"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
@@ -331,7 +331,7 @@
 
                             <TextView
                                 android:layout_width="0dp"
-
+                                android:id="@+id/tv_detail_wind"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
@@ -358,7 +358,7 @@
 
                             <TextView
                                 android:layout_width="0dp"
-
+                                android:id="@+id/tv_detail_tmp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
@@ -386,7 +386,7 @@
 
                             <TextView
                                 android:layout_width="0dp"
-
+                                android:id="@+id/tv_detail_pcpn"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
@@ -413,7 +413,7 @@
 
                             <TextView
                                 android:layout_width="0dp"
-
+                                android:id="@+id/tv_detail_pres"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
@@ -441,7 +441,7 @@
 
                             <TextView
                                 android:layout_width="0dp"
-
+                                android:id="@+id/tv_detail_vis"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
@@ -457,23 +457,22 @@
 
                             <TextView
                                 android:layout_width="0dp"
-
                                 android:layout_height="wrap_content"
                                 android:layout_marginRight="10dp"
                                 android:layout_weight="1"
                                 android:gravity="right"
-                                android:text="紫外线指数:"
+                                android:text="空气质量:"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/default_text_size" />
 
                             <TextView
                                 android:layout_width="0dp"
-
+                                android:id="@+id/tv_detail_airq"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
                                 android:gravity="left"
-                                android:text="1"
+                                android:text="优"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/default_text_size" />
                         </LinearLayout>

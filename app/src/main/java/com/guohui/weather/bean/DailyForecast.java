@@ -57,6 +57,7 @@ public class DailyForecast {
         pcpn = root.getString("pcpn");
         pop = root.getString("pop");
         vis = root.getString("vis");
+        pres =root.getString("pres");
         astro = new Astro(root.getJSONObject("astro").toString());
         cond = new Cond(root.getJSONObject("cond").toString());
         tmp = new Tmp(root.getJSONObject("tmp").toString());
@@ -65,6 +66,9 @@ public class DailyForecast {
 
     //日期
     String date;
+
+    //气压
+    String pres;
 
     //湿度
     String hum;
@@ -163,7 +167,7 @@ public class DailyForecast {
     }
 
     //天文数值
-    class Astro{
+    public class Astro{
 
         public Astro(String jsonFile) throws JSONException {
             JSONObject root = new JSONObject(jsonFile);
@@ -174,10 +178,18 @@ public class DailyForecast {
         String sr;
         //日落
         String ss;
+
+        public String getSr() {
+            return sr;
+        }
+
+        public String getSs() {
+            return ss;
+        }
     }
 
     //天气状况
-    class Cond{
+    public class Cond{
 
         public Cond(String jsonFile) throws JSONException {
             JSONObject root = new JSONObject(jsonFile);
@@ -195,6 +207,38 @@ public class DailyForecast {
         String txt_d;
         //夜间天气描述
         String txt_n;
+
+        public String getCode_d() {
+            return code_d;
+        }
+
+        public void setCode_d(String code_d) {
+            this.code_d = code_d;
+        }
+
+        public String getCode_n() {
+            return code_n;
+        }
+
+        public void setCode_n(String code_n) {
+            this.code_n = code_n;
+        }
+
+        public String getTxt_d() {
+            return txt_d;
+        }
+
+        public void setTxt_d(String txt_d) {
+            this.txt_d = txt_d;
+        }
+
+        public String getTxt_n() {
+            return txt_n;
+        }
+
+        public void setTxt_n(String txt_n) {
+            this.txt_n = txt_n;
+        }
     }
 
   public    class  Tmp{

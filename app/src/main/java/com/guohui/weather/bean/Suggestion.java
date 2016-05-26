@@ -76,7 +76,7 @@ public class Suggestion {
 
 
 
-    class  Comf{
+    public class  Comf{
 
         public Comf(String jsonFile) throws JSONException {
             JSONObject root = new JSONObject(jsonFile);
@@ -88,6 +88,14 @@ public class Suggestion {
         String brf;
         //说明
         String txt;
+
+        public String getBrf() {
+            return brf;
+        }
+
+        public String getTxt() {
+            return txt;
+        }
     }
 
     class  Cw{

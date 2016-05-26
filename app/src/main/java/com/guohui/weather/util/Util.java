@@ -2,6 +2,10 @@ package com.guohui.weather.util;
 
 import android.content.Context;
 
+import com.guohui.weather.R;
+
+import java.lang.reflect.Field;
+
 /**
  * Created by Dikaros on 2016/5/22.
  */
@@ -32,5 +36,51 @@ public class Util {
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         //px/sp =
         return (int) ((spValue - 0.5f) * fontScale);
+    }
+
+
+    /**
+     * 通过drawable的名字获取其id（通过反射）
+     * @param name drawable名
+     * @return id
+     *
+     */
+    public static int getDrawableByName(String name){
+        int id = -1;
+        Class drawable = R.drawable.class;
+        Field field = null;
+        try{
+            field = drawable.getField(name);
+            id = field.getInt(field.getName());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return  id;
+    }
+
+    /**
+     * 获取星期数
+     * @param dayOfWeek
+     * @return
+     */
+    public static String getWeekDay(int dayOfWeek){
+        switch (dayOfWeek){
+            case 1:
+                return "星期日";
+            case 2:
+                return "星期一";
+            case 3:
+                return "星期二";
+            case 4:
+                return "星期三";
+            case 5:
+                return "星期四";
+            case 6:
+                return "星期五";
+            case 7:
+                return "星期六";
+        }
+        return null;
     }
 }

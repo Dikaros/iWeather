@@ -45,12 +45,15 @@ public class MainActivity extends AppCompatActivity {
     @FindView(R.id.sv_main)
     CustomScrollView svMain;
 
+    //title布局
     @FindView(R.id.ll_city)
     LinearLayout llCityTitle;
 
+    //当前温度
     @FindView(R.id.tv_current_temp)
     TextView tvCurrentTemp;
 
+    //当前温度单位
     @FindView(R.id.tv_current_temp_unit)
     TextView tvCurrentTempUnit;
 
@@ -58,32 +61,103 @@ public class MainActivity extends AppCompatActivity {
     @FindView(R.id.rl_weather_by_hour)
     RelativeLayout rlWeatherByHour;
 
+    //今日天气信息布局
     @FindView(R.id.rl_today_temp_mess)
     RelativeLayout rlTodayTempMess;
 
+    //未来天气预报信息
     @FindView(R.id.ll_weather_forcast)
     LinearLayout llWeatherForcast;
 
+    //未来几个小时的天气信息（按小时）
     @FindView(R.id.ll_weather_hourly)
     LinearLayout llWeatherHourly;
 
+    //小时的图片
     @FindView(R.id.iv_hourly_back)
     ImageView ivHourly;
 
-    @FindView(R.id.view_blank)
+    //空白补间
     View viewBlank;
 
     @FindView(R.id.sv_more)
     InnerScrollView svMore;
 
 
-    @FindView(R.id.view_hourly_blank)
     View viewHourlyBlank;
 
     @FindView(R.id.rl_root)
     RelativeLayout rlRoot;
 
+    //城市名
+    @FindView(R.id.tv_city_name)
+    TextView tvCityName;
+
+    //城市状态
+    @FindView(R.id.tv_city_stat)
+    TextView tvCityStat;
+
+    //今日星期
+    @FindView(R.id.tv_date_day_of_week)
+    TextView tvDateOfWeek;
+
+    //最高温度
+    @FindView(R.id.tv_today_temp_max)
+    TextView tvTodayTmpMax;
+    //最低温度
+    @FindView(R.id.tv_item_temp_min)
+    TextView tvTodayTmpMin;
+
+    //今日提醒消息
+    @FindView(R.id.tv_today_message)
+    TextView tvTodayMessage;
+
+    //日出
+    @FindView(R.id.tv_detail_sr)
+    TextView tvDetailSr;
+
+    //日落
+    @FindView(R.id.tv_detail_ss)
+    TextView tvDetailSs;
+
+    //降水率
+    @FindView(R.id.tv_detail_pop)
+    TextView tvDetailPop;
+
+    //湿度
+    @FindView(R.id.tv_detail_hum)
+    TextView tvDetailHum;
+
+    //风速
+    @FindView(R.id.tv_detail_wind)
+    TextView tvDetailWind;
+
+    //体感温度
+    @FindView(R.id.tv_detail_tmp)
+    TextView tvDetailTmp;
+
+    //降水量
+    @FindView(R.id.tv_detail_pcpn)
+    TextView tvDetailPcpn;
+
+    //气压
+    @FindView(R.id.tv_detail_pres)
+    TextView tvDetailPres;
+
+    //能见度
+    @FindView(R.id.tv_detail_vis)
+    TextView tvDetailVis;
+
+    //空气质量
+    @FindView(R.id.tv_detail_airq)
+    TextView tvDetailAirq;
+
+
+
+    //当前的天气情况
     Weather currentWeather;
+
+
 
 
     //主ScrollView滑动的距离
@@ -96,7 +170,8 @@ public class MainActivity extends AppCompatActivity {
         initWindow();
         //为声明的view findId
         SimpifyUtil.findAllViews(this);
-
+        viewHourlyBlank = findViewById(R.id.view_blank_hourly);
+        viewBlank = findViewById(R.id.view_blank);
         //初始化日期
         initDate();
         //加载滑动布局
@@ -122,9 +197,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterAccessNet(String result) {
                 if (result!=null){
-//                    Log.e("result",result);
-                    currentWeather = new Weather(result);
-                    updateWeatherUi();
+                    Log.e("result",result);
+//                    currentWeather = new Weather(result);
+//                    Log.e("result",currentWeather.toString());
+//                    updateWeatherUi();
 
                 }
             }
@@ -160,8 +236,55 @@ public class MainActivity extends AppCompatActivity {
         calendar.setTime(currentTime);
     }
 
+    /**
+     * 更新天气UI
+     */
     public void updateWeatherUi(){
+        //设置天气预报
         initWeatherForcast();
+        //设置城市名称
+        tvCityName.setText(currentWeather.getBasic().getCity());
+        //设置当前天气情况
+        tvCityStat.setText(currentWeather.getDaily_forecast().get(0).getCond().getTxt_d());
+        //设置当前温度
+        tvCurrentTemp.setText(currentWeather.getHourly_forecast().get(0).getTmp());
+        //设置今日星期
+        tvDateOfWeek.setText(Util.getWeekDay(calendar.get(Calendar.DAY_OF_WEEK)));
+        //设置今日最高温度
+        tvTodayTmpMax.setText(currentWeather.getDaily_forecast().get(0).getTmp().getMax());
+        //设置今日最低温度
+        tvTodayTmpMin.setText(currentWeather.getDaily_forecast().get(0).getTmp().getMin());
+        //设置今日提醒消息
+        tvTodayMessage.setText("今日最高温度:"+tvTodayTmpMax.getText()+"今日最低温度:"+tvTodayTmpMin.getText()+","+currentWeather.getSuggestion().getComf().getTxt());
+        //日出
+        tvDetailSr.setText(currentWeather.getDaily_forecast().get(0).getAstro().getSr());
+
+        //日落
+        tvDetailSs.setText(currentWeather.getDaily_forecast().get(0).getAstro().getSs());
+
+        //降水率
+        tvDetailPop.setText(currentWeather.getHourly_forecast().get(0).getPop()+"%");
+
+        //湿度
+        tvDetailHum.setText(currentWeather.getHourly_forecast().get(0).getHum()+"%");
+        //风速
+        tvDetailWind.setText(currentWeather.getHourly_forecast().get(0).getWind().toString());
+
+        //体感温度
+        tvDetailTmp.setText(currentWeather.getHourly_forecast().get(0).getTmp()+"°");
+
+        //降水量
+        tvDetailPcpn.setText(currentWeather.getDaily_forecast().get(0).getPcpn()+"厘米");
+
+        //气压
+        tvDetailPres.setText(currentWeather.getHourly_forecast().get(0).getPres()+"百帕");
+        //能见度
+        tvDetailVis.setText(currentWeather.getDaily_forecast().get(0).getVis()+"千米");
+
+        //空气质量
+        tvDetailAirq.setText(currentWeather.getSuggestion().getComf().getTxt());
+
+
     }
 
     private void initWeatherForcast() {
@@ -170,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
         llWeatherForcast.removeAllViews();
         if (currentWeather ==null) {
             for (int i = 1; i <= 7; i++) {
-                llWeatherForcast.addView(new DailyForecastView(this, "星期" + i, (20 + i) + "", (20 - i) + "").getView());
+                llWeatherForcast.addView(new DailyForecastView(this, Util.getWeekDay(i), (20 + i) + "", (20 - i) + "").getView());
             }
 
             //增加小时播报
@@ -187,16 +310,23 @@ public class MainActivity extends AppCompatActivity {
             }
         }else {
 
-            for (int i=0;i<currentWeather.getDaily_forecast().size();i++){
+            for (int i=1;i<currentWeather.getDaily_forecast().size();i++){
                 DailyForecast f = currentWeather.getDaily_forecast().get(i);
-                llWeatherForcast.addView(new DailyForecastView(this,"星期"+(calendar.get(Calendar.DAY_OF_WEEK)+i)%7,f.getTmp().getMax(),f.getTmp().getMin()).getView());
+                llWeatherForcast.addView(new DailyForecastView(this,Util.getWeekDay((calendar.get(Calendar.DAY_OF_WEEK)+i)%7),f.getTmp().getMax(),f.getTmp().getMin()).getView());
             }
 
             for (int i=0;i<currentWeather.getHourly_forecast().size();i++){
+                if (i==0){
+                    HourlyForecast h = currentWeather.getHourly_forecast().get(i);
+                    llWeatherHourly.addView(new HourlyForecastView(this,"现在",h.getTmp()).getView());
+                    continue;
+                }
                 HourlyForecast h = currentWeather.getHourly_forecast().get(i);
                 llWeatherHourly.addView(new HourlyForecastView(this,h.getDate().substring(h.getDate().length()-5,h.getDate().length()),h.getTmp()).getView());
             }
         }
+
+
 
     }
 

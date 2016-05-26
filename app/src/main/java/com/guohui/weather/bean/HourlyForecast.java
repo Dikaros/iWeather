@@ -54,7 +54,7 @@ public class HourlyForecast {
         this.wind = wind;
     }
 
-    class  Wind{
+   public class  Wind{
 
         public Wind(String jsonFile) throws JSONException {
             JSONObject root = new JSONObject(jsonFile);
@@ -71,6 +71,11 @@ public class HourlyForecast {
         String sc;
         //风速
         String spd;
+
+        @Override
+        public String toString() {
+            return dir+" "+spd+"米/秒";
+        }
     }
 
     public String getDate() {

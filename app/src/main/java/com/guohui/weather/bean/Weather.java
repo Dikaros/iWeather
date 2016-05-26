@@ -38,7 +38,6 @@ public class Weather {
             JSONArray rootArray = root.getJSONArray(WEATHER_API_VERSION);
             JSONObject weatherJson = rootArray.getJSONObject(0);
             //实例化aqi,并使用Gson处理json
-//            aqi = new Aqi(weatherJson.getJSONObject("aqi").toString());
             aqi = gson.fromJson(weatherJson.getJSONObject("aqi").getJSONObject("city").toString(),Aqi.class);
             //实例化basic,并将其json交给自身处理
             basic = new Basic(weatherJson.getJSONObject("basic").toString());
