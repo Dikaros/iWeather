@@ -66,19 +66,19 @@ public class Util {
      */
     public static String getWeekDay(int dayOfWeek){
         switch (dayOfWeek){
-            case 1:
+            case 0:
                 return "星期日";
-            case 2:
+            case 1:
                 return "星期一";
-            case 3:
+            case 2:
                 return "星期二";
-            case 4:
+            case 3:
                 return "星期三";
-            case 5:
+            case 4:
                 return "星期四";
-            case 6:
+            case 5:
                 return "星期五";
-            case 7:
+            case 6:
                 return "星期六";
         }
         return null;

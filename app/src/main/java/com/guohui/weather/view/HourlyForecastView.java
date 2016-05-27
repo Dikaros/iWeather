@@ -3,6 +3,7 @@ package com.guohui.weather.view;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dikaros.simplifyfindwidget.SimpifyUtil;
@@ -20,15 +21,26 @@ public class HourlyForecastView {
     @FindView(R.id.tv_hour_item_temp)
     TextView tvTemp;
 
+    @FindView(R.id.iv_hour_item_image)
+    ImageView ivDay;
+
 
     View view;
 
+    public HourlyForecastView(Context context, String time, String temp,int resourceId){
+        view= LayoutInflater.from(context).inflate(R.layout.hourly_forecast_item_view,null);
+        SimpifyUtil.findAllViews(this,view);
+        tvDay.setText(time);
+        tvTemp.setText(temp);
+        ivDay.setImageResource(resourceId);
+    }
     public HourlyForecastView(Context context, String time, String temp){
         view= LayoutInflater.from(context).inflate(R.layout.hourly_forecast_item_view,null);
         SimpifyUtil.findAllViews(this,view);
         tvDay.setText(time);
         tvTemp.setText(temp);
     }
+
 
     public View getView() {
         return view;

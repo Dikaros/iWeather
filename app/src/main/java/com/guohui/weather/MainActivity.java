@@ -26,9 +26,11 @@ import com.dikaros.asynet.AsyNet;
 import com.dikaros.asynet.NormalAsyNet;
 import com.dikaros.simplifyfindwidget.SimpifyUtil;
 import com.dikaros.simplifyfindwidget.annotation.FindView;
+import com.guohui.weather.bean.CondIcons;
 import com.guohui.weather.bean.DailyForecast;
 import com.guohui.weather.bean.HourlyForecast;
 import com.guohui.weather.bean.Weather;
+import com.guohui.weather.util.AlertUtil;
 import com.guohui.weather.util.Util;
 import com.guohui.weather.view.CustomScrollView;
 import com.guohui.weather.view.DailyForecastView;
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     @FindView(R.id.tv_today_temp_max)
     TextView tvTodayTmpMax;
     //最低温度
-    @FindView(R.id.tv_item_temp_min)
+    @FindView(R.id.tv_today_temp_min)
     TextView tvTodayTmpMin;
 
     //今日提醒消息
@@ -153,11 +155,11 @@ public class MainActivity extends AppCompatActivity {
     TextView tvDetailAirq;
 
 
-
     //当前的天气情况
     Weather currentWeather;
 
-
+    //网络访问器
+    NormalAsyNet weatherNetHelper;
 
 
     //主ScrollView滑动的距离
@@ -186,9 +188,17 @@ public class MainActivity extends AppCompatActivity {
         //初始化动画效果
         initAnimation();
 
-        NormalAsyNet net = new NormalAsyNet("http://apis.baidu.com/heweather/pro/weather?city=changsha", AsyNet.NetMethod.GET);
-        net.addHeader("apikey",Config.API_KEY);
-        net.setOnNetStateChangedListener(new AsyNet.OnNetStateChangedListener<String>() {
+       updateWeatherFromNet();
+    }
+
+
+    /**
+     * 访问天气
+     */
+    public void updateWeatherFromNet(){
+        weatherNetHelper = new NormalAsyNet(Config.BAIDU_WEATHER_DETAIL_URL+"changsha", AsyNet.NetMethod.GET);
+        weatherNetHelper.addHeader("apikey", Config.BAIDU_API_KEY);
+        weatherNetHelper.setOnNetStateChangedListener(new AsyNet.OnNetStateChangedListener<String>() {
             @Override
             public void beforeAccessNet() {
 
@@ -196,10 +206,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterAccessNet(String result) {
-                if (result!=null){
-                    Log.e("result",result);
-//                    currentWeather = new Weather(result);
-//                    Log.e("result",currentWeather.toString());
+                Log.e("weather", result);
+                if (result != null) {
+                    if (result.startsWith("{")) {
+                        currentWeather = new Weather(result);
+                        updateWeatherUi();
+                    }else {
+                        AlertUtil.toastMess(MainActivity.this,"远程服务器异常");
+                    }
+
+
+
 //                    updateWeatherUi();
 
                 }
@@ -216,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        net.execute();
+        weatherNetHelper.execute();
     }
 
     private void initAnimation() {
@@ -239,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 更新天气UI
      */
-    public void updateWeatherUi(){
+    public void updateWeatherUi() {
         //设置天气预报
         initWeatherForcast();
         //设置城市名称
@@ -255,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
         //设置今日最低温度
         tvTodayTmpMin.setText(currentWeather.getDaily_forecast().get(0).getTmp().getMin());
         //设置今日提醒消息
-        tvTodayMessage.setText("今日最高温度:"+tvTodayTmpMax.getText()+"今日最低温度:"+tvTodayTmpMin.getText()+","+currentWeather.getSuggestion().getComf().getTxt());
+        tvTodayMessage.setText("今日最高温度:" + tvTodayTmpMax.getText() + "今日最低温度:" + tvTodayTmpMin.getText() + "," + currentWeather.getSuggestion().getComf().getTxt());
         //日出
         tvDetailSr.setText(currentWeather.getDaily_forecast().get(0).getAstro().getSr());
 
@@ -263,35 +280,37 @@ public class MainActivity extends AppCompatActivity {
         tvDetailSs.setText(currentWeather.getDaily_forecast().get(0).getAstro().getSs());
 
         //降水率
-        tvDetailPop.setText(currentWeather.getHourly_forecast().get(0).getPop()+"%");
+        tvDetailPop.setText(currentWeather.getHourly_forecast().get(0).getPop() + "%");
 
         //湿度
-        tvDetailHum.setText(currentWeather.getHourly_forecast().get(0).getHum()+"%");
+        tvDetailHum.setText(currentWeather.getHourly_forecast().get(0).getHum() + "%");
         //风速
         tvDetailWind.setText(currentWeather.getHourly_forecast().get(0).getWind().toString());
 
         //体感温度
-        tvDetailTmp.setText(currentWeather.getHourly_forecast().get(0).getTmp()+"°");
+        tvDetailTmp.setText(currentWeather.getHourly_forecast().get(0).getTmp() + "°");
 
         //降水量
-        tvDetailPcpn.setText(currentWeather.getDaily_forecast().get(0).getPcpn()+"厘米");
+        tvDetailPcpn.setText(currentWeather.getDaily_forecast().get(0).getPcpn() + "厘米");
 
         //气压
-        tvDetailPres.setText(currentWeather.getHourly_forecast().get(0).getPres()+"百帕");
+        tvDetailPres.setText(currentWeather.getHourly_forecast().get(0).getPres() + "百帕");
         //能见度
-        tvDetailVis.setText(currentWeather.getDaily_forecast().get(0).getVis()+"千米");
+        tvDetailVis.setText(currentWeather.getDaily_forecast().get(0).getVis() + "千米");
 
         //空气质量
-        tvDetailAirq.setText(currentWeather.getSuggestion().getComf().getTxt());
+        tvDetailAirq.setText(currentWeather.getAqi().getQlty());
 
 
     }
+
+
 
     private void initWeatherForcast() {
 
         llWeatherHourly.removeAllViews();
         llWeatherForcast.removeAllViews();
-        if (currentWeather ==null) {
+        if (currentWeather == null) {
             for (int i = 1; i <= 7; i++) {
                 llWeatherForcast.addView(new DailyForecastView(this, Util.getWeekDay(i), (20 + i) + "", (20 - i) + "").getView());
             }
@@ -308,24 +327,23 @@ public class MainActivity extends AppCompatActivity {
                     llWeatherHourly.addView(new HourlyForecastView(this, String.format("%02d:00", (calendar.get(Calendar.HOUR_OF_DAY) + i) % 24), 20 - i + "°").getView());
                 }
             }
-        }else {
+        } else {
 
-            for (int i=1;i<currentWeather.getDaily_forecast().size();i++){
+            for (int i = 1; i < currentWeather.getDaily_forecast().size(); i++) {
                 DailyForecast f = currentWeather.getDaily_forecast().get(i);
-                llWeatherForcast.addView(new DailyForecastView(this,Util.getWeekDay((calendar.get(Calendar.DAY_OF_WEEK)+i)%7),f.getTmp().getMax(),f.getTmp().getMin()).getView());
+                llWeatherForcast.addView(new DailyForecastView(this, Util.getWeekDay((calendar.get(Calendar.DAY_OF_WEEK) + i) % 7), f.getTmp().getMax(), f.getTmp().getMin(), CondIcons.getIconDrawable(this,currentWeather.getDaily_forecast().get(i).getCond().getCode_d())).getView());
             }
 
-            for (int i=0;i<currentWeather.getHourly_forecast().size();i++){
-                if (i==0){
+            for (int i = 0; i < currentWeather.getHourly_forecast().size(); i++) {
+                if (i == 0) {
                     HourlyForecast h = currentWeather.getHourly_forecast().get(i);
-                    llWeatherHourly.addView(new HourlyForecastView(this,"现在",h.getTmp()).getView());
+                    llWeatherHourly.addView(new HourlyForecastView(this, "现在", h.getTmp()).getView());
                     continue;
                 }
                 HourlyForecast h = currentWeather.getHourly_forecast().get(i);
-                llWeatherHourly.addView(new HourlyForecastView(this,h.getDate().substring(h.getDate().length()-5,h.getDate().length()),h.getTmp()).getView());
+                llWeatherHourly.addView(new HourlyForecastView(this, h.getDate().substring(h.getDate().length() - 5, h.getDate().length()), h.getTmp(),CondIcons.getIconDrawable(this,currentWeather.getDaily_forecast().get(0).getCond().getCode_d())).getView());
             }
         }
-
 
 
     }
@@ -371,8 +389,6 @@ public class MainActivity extends AppCompatActivity {
         initLocation();
 
 
-
-
     }
 
 
@@ -380,18 +396,18 @@ public class MainActivity extends AppCompatActivity {
      * 加载滑动布局
      */
     private void initScrollView() {
-        svMore.setParentScrollView(svMain);
         svMain.setIntercept(true);
+        svMain.setInnerScrollView(svMore);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        layoutParams.setMargins(0, Util.sp2px(this,18)+Util.dip2px(this,140+96), 0, 0);
+        layoutParams.setMargins(0, Util.sp2px(this, 18) + Util.dip2px(this, 140 + 96), 0, 0);
         rlWeatherByHour.setLayoutParams(layoutParams);
 
         svMain.setScrollChangedCallback(new CustomScrollView.OnScrollChangedCallback() {
             @Override
             public void onScrollChanged(CustomScrollView scrollView, int x, int y, int oldX, int oldY) {
 
-                ((RelativeLayout.LayoutParams)rlWeatherByHour.getLayoutParams()).setMargins(0,0,0,0);
+                ((RelativeLayout.LayoutParams) rlWeatherByHour.getLayoutParams()).setMargins(0, 0, 0, 0);
 //                svMore.
                 if (startHsvY == -1) {
                     startHsvY = viewHourlyBlank.getY();
@@ -416,14 +432,14 @@ public class MainActivity extends AppCompatActivity {
                         rlTodayTempMess.setAlpha(alpha);
                         tvCurrentTemp.setAlpha(alpha);
                         tvCurrentTempUnit.setAlpha(alpha);
-                        llCityTitle.setPadding(0, (int) (Util.dip2px(MainActivity.this,15)+(Util.dip2px(MainActivity.this,10))*alpha),0,0);
+                        llCityTitle.setPadding(0, (int) (Util.dip2px(MainActivity.this, 15) + (Util.dip2px(MainActivity.this, 10)) * alpha), 0, 0);
                     }
                     //向上滑
                     else {
                         rlTodayTempMess.setAlpha(alpha);
                         tvCurrentTemp.setAlpha(alpha);
                         tvCurrentTempUnit.setAlpha(alpha);
-                        llCityTitle.setPadding(0, (int) (Util.dip2px(MainActivity.this,15)+(Util.dip2px(MainActivity.this,10))*alpha),0,0);
+                        llCityTitle.setPadding(0, (int) (Util.dip2px(MainActivity.this, 15) + (Util.dip2px(MainActivity.this, 10)) * alpha), 0, 0);
 
 
                     }
@@ -431,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
                     rlTodayTempMess.setAlpha(0);
                     tvCurrentTemp.setAlpha(0);
                     tvCurrentTempUnit.setAlpha(0);
-                    llCityTitle.setPadding(0, Util.dip2px(MainActivity.this,15),0,0);
+                    llCityTitle.setPadding(0, Util.dip2px(MainActivity.this, 15), 0, 0);
 
                 }
 

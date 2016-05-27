@@ -2,6 +2,8 @@ package com.guohui.weather.view;
 
 import android.content.Context;
 import android.content.pm.LauncherApps;
+import android.support.v4.view.NestedScrollingParent;
+import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -11,7 +13,7 @@ import android.widget.ScrollView;
  * Created by Dikaros on 2016/5/22.
  * 由于ScrollView本身没有向外界提供滑动改变的回调，所以继承这个类并设置对外的回调方法
  */
-public class CustomScrollView extends ScrollView {
+public class CustomScrollView extends NestedScrollView {
     public CustomScrollView(Context context) {
         super(context);
     }
@@ -27,6 +29,16 @@ public class CustomScrollView extends ScrollView {
     //回调接口
     OnScrollChangedCallback scrollChangedCallback;
 
+    InnerScrollView innerScrollView;
+
+
+    public InnerScrollView getInnerScrollView() {
+        return innerScrollView;
+    }
+
+    public void setInnerScrollView(InnerScrollView innerScrollView) {
+        this.innerScrollView = innerScrollView;
+    }
 
     /**
      * 设置回调对象
@@ -45,6 +57,15 @@ public class CustomScrollView extends ScrollView {
         if (scrollChangedCallback != null) {
             scrollChangedCallback.onScrollChanged(this, l, t, oldl, oldt);
         }
+//        Log.d("customScroll",getHeight()+"===="+getScrollY()+"==="+getChildAt(0).getHeight());
+
+
+
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        return super.onTouchEvent(ev);
 
     }
 

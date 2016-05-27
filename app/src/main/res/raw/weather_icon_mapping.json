@@ -1,6 +1,316 @@
-[
-  {
-    "code":"100",
-    "ch":"晴"
-  }
-]
+{
+  "cond_info": [
+    {
+      "code": "100",
+      "txt": "晴",
+      "txt_en": "Sunny/Clear",
+      "icon": "i100"
+    },
+    {
+      "code": "101",
+      "txt": "多云",
+      "txt_en": "Cloudy",
+      "icon": "i101"
+    },
+    {
+      "code": "102",
+      "txt": "少云",
+      "txt_en": "Few Clouds",
+      "icon": "i102"
+    },
+    {
+      "code": "103",
+      "txt": "晴间多云",
+      "txt_en": "Partly Cloudy",
+      "icon": "i103"
+    },
+    {
+      "code": "104",
+      "txt": "阴",
+      "txt_en": "Overcast",
+      "icon": "i104"
+    },
+    {
+      "code": "200",
+      "txt": "有风",
+      "txt_en": "Windy",
+      "icon": "i200"
+    },
+    {
+      "code": "201",
+      "txt": "平静",
+      "txt_en": "Calm",
+      "icon": "i201"
+    },
+    {
+      "code": "202",
+      "txt": "微风",
+      "txt_en": "Light Breeze",
+      "icon": "i202"
+    },
+    {
+      "code": "203",
+      "txt": "和风",
+      "txt_en": "Moderate/Gentle Breeze",
+      "icon": "i203"
+    },
+    {
+      "code": "204",
+      "txt": "清风",
+      "txt_en": "Fresh Breeze",
+      "icon": "i204"
+    },
+    {
+      "code": "205",
+      "txt": "强风/劲风",
+      "txt_en": "Strong Breeze",
+      "icon": "i205"
+    },
+    {
+      "code": "206",
+      "txt": "疾风",
+      "txt_en": "High Wind, Near Gale",
+      "icon": "i206"
+    },
+    {
+      "code": "207",
+      "txt": "大风",
+      "txt_en": "Gale",
+      "icon": "i207"
+    },
+    {
+      "code": "208",
+      "txt": "烈风",
+      "txt_en": "Strong Gale",
+      "icon": "i208"
+    },
+    {
+      "code": "209",
+      "txt": "风暴",
+      "txt_en": "Storm",
+      "icon": "i209"
+    },
+    {
+      "code": "210",
+      "txt": "狂爆风",
+      "txt_en": "Violent Storm",
+      "icon": "i210"
+    },
+    {
+      "code": "211",
+      "txt": "飓风",
+      "txt_en": "Hurricane",
+      "icon": "i211"
+    },
+    {
+      "code": "212",
+      "txt": "龙卷风",
+      "txt_en": "Tornado",
+      "icon": "i212"
+    },
+    {
+      "code": "213",
+      "txt": "热带风暴",
+      "txt_en": "Tropical Storm",
+      "icon": "i213"
+    },
+    {
+      "code": "300",
+      "txt": "阵雨",
+      "txt_en": "Shower Rain",
+      "icon": "i300"
+    },
+    {
+      "code": "301",
+      "txt": "强阵雨",
+      "txt_en": "Heavy Shower Rain",
+      "icon": "i301"
+    },
+    {
+      "code": "302",
+      "txt": "雷阵雨",
+      "txt_en": "Thundershower",
+      "icon": "i302"
+    },
+    {
+      "code": "303",
+      "txt": "强雷阵雨",
+      "txt_en": "Heavy Thunderstorm",
+      "icon": "i303"
+    },
+    {
+      "code": "304",
+      "txt": "雷阵雨伴有冰雹",
+      "txt_en": "Hail",
+      "icon": "i304"
+    },
+    {
+      "code": "305",
+      "txt": "小雨",
+      "txt_en": "Light Rain",
+      "icon": "i305"
+    },
+    {
+      "code": "306",
+      "txt": "中雨",
+      "txt_en": "Moderate Rain",
+      "icon": "i306"
+    },
+    {
+      "code": "307",
+      "txt": "大雨",
+      "txt_en": "Heavy Rain",
+      "icon": "i307"
+    },
+    {
+      "code": "308",
+      "txt": "极端降雨",
+      "txt_en": "Extreme Rain",
+      "icon": "i308"
+    },
+    {
+      "code": "309",
+      "txt": "毛毛雨/细雨",
+      "txt_en": "Drizzle Rain",
+      "icon": "i309"
+    },
+    {
+      "code": "310",
+      "txt": "暴雨",
+      "txt_en": "Storm",
+      "icon": "i310"
+    },
+    {
+      "code": "311",
+      "txt": "大暴雨",
+      "txt_en": "Heavy Storm",
+      "icon": "i311"
+    },
+    {
+      "code": "312",
+      "txt": "特大暴雨",
+      "txt_en": "Severe Storm",
+      "icon": "i312"
+    },
+    {
+      "code": "313",
+      "txt": "冻雨",
+      "txt_en": "Freezing Rain",
+      "icon": "i313"
+    },
+    {
+      "code": "400",
+      "txt": "小雪",
+      "txt_en": "Light Snow",
+      "icon": "i400"
+    },
+    {
+      "code": "401",
+      "txt": "中雪",
+      "txt_en": "Moderate Snow",
+      "icon": "i401"
+    },
+    {
+      "code": "402",
+      "txt": "大雪",
+      "txt_en": "Heavy Snow",
+      "icon": "i402"
+    },
+    {
+      "code": "403",
+      "txt": "暴雪",
+      "txt_en": "Snowstorm",
+      "icon": "i403"
+    },
+    {
+      "code": "404",
+      "txt": "雨夹雪",
+      "txt_en": "Sleet",
+      "icon": "i404"
+    },
+    {
+      "code": "405",
+      "txt": "雨雪天气",
+      "txt_en": "Rain And Snow",
+      "icon": "i405"
+    },
+    {
+      "code": "406",
+      "txt": "阵雨夹雪",
+      "txt_en": "Shower Snow",
+      "icon": "i406"
+    },
+    {
+      "code": "407",
+      "txt": "阵雪",
+      "txt_en": "Snow Flurry",
+      "icon": "i407"
+    },
+    {
+      "code": "500",
+      "txt": "薄雾",
+      "txt_en": "Mist",
+      "icon": "i500"
+    },
+    {
+      "code": "501",
+      "txt": "雾",
+      "txt_en": "Foggy",
+      "icon": "i501"
+    },
+    {
+      "code": "502",
+      "txt": "霾",
+      "txt_en": "Haze",
+      "icon": "i502"
+    },
+    {
+      "code": "503",
+      "txt": "扬沙",
+      "txt_en": "Sand",
+      "icon": "i503"
+    },
+    {
+      "code": "504",
+      "txt": "浮尘",
+      "txt_en": "Dust",
+      "icon": "i504"
+    },
+    {
+      "code": "506",
+      "txt": "火山灰",
+      "txt_en": "Volcanic Ash",
+      "icon": "i506"
+    },
+    {
+      "code": "507",
+      "txt": "沙尘暴",
+      "txt_en": "Duststorm",
+      "icon": "i507"
+    },
+    {
+      "code": "508",
+      "txt": "强沙尘暴",
+      "txt_en": "Sandstorm",
+      "icon": "i508"
+    },
+    {
+      "code": "900",
+      "txt": "热",
+      "txt_en": "Hot",
+      "icon": "i900"
+    },
+    {
+      "code": "901",
+      "txt": "冷",
+      "txt_en": "Cold",
+      "icon": "i901"
+    },
+    {
+      "code": "999",
+      "txt": "未知",
+      "txt_en": "Unknown",
+      "icon": "i999"
+    }
+  ]
+}

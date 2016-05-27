@@ -1,6 +1,8 @@
 package com.guohui.weather.view;
 
 import android.content.Context;
+import android.support.v4.view.NestedScrollingChild;
+import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -9,8 +11,7 @@ import android.widget.ScrollView;
 /**
  * Created by Dikaros on 2016/5/24.
  */
-public class InnerScrollView extends ScrollView {
-    public ScrollView parentScrollView;
+public class InnerScrollView extends NestedScrollView{
 
     public InnerScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -49,72 +50,68 @@ public class InnerScrollView extends ScrollView {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (parentScrollView == null) {
-            return super.onInterceptTouchEvent(ev);
-        } else {
-            if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-                // 将父scrollview的滚动事件拦截
-                currentY = (int)ev.getY();
-                setParentScrollAble(false);
-                return super.onInterceptTouchEvent(ev);
-            } else if (ev.getAction() == MotionEvent.ACTION_UP) {
-                // 把滚动事件恢复给父Scrollview
-                setParentScrollAble(true);
-            } else if (ev.getAction() == MotionEvent.ACTION_MOVE) {
-            }
-        }
+//        if (parentScrollView == null) {
+//            return super.onInterceptTouchEvent(ev);
+//        } else {
+//            if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+//                // 将父scrollview的滚动事件拦截
+//                currentY = (int)ev.getY();
+//                setParentScrollAble(false);
+//                return super.onInterceptTouchEvent(ev);
+//            } else if (ev.getAction() == MotionEvent.ACTION_UP) {
+//                // 把滚动事件恢复给父Scrollview
+//                setParentScrollAble(true);
+//            } else if (ev.getAction() == MotionEvent.ACTION_MOVE) {
+//            }
+//        }
         return super.onInterceptTouchEvent(ev);
 
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        View child = getChildAt(0);
-        if (parentScrollView != null) {
-            if (ev.getAction() == MotionEvent.ACTION_MOVE) {
-                int height = child.getMeasuredHeight();
-                height = height - getMeasuredHeight();
-
-                // System.out.println("height=" + height);
-                int scrollY = getScrollY();
-                // System.out.println("scrollY" + scrollY);
-                int y = (int)ev.getY();
-
-                // 手指向下滑动
-                if (currentY < y) {
-                    if (scrollY <= 0) {
-                        // 如果向下滑动到头，就把滚动交给父Scrollview
-                        setParentScrollAble(true);
-                        return false;
-                    } else {
-                        setParentScrollAble(false);
-
-                    }
-                } else if (currentY > y) {
-                    if (scrollY >= height) {
-                        // 如果向上滑动到头，就把滚动交给父Scrollview
-                        setParentScrollAble(true);
-                        return false;
-                    } else {
-                        setParentScrollAble(false);
-
-                    }
-
-                }
-                currentY = y;
-            }
-        }
+//        View child = getChildAt(0);
+//        if (parentScrollView != null) {
+//            if (ev.getAction() == MotionEvent.ACTION_MOVE) {
+//                int height = child.getMeasuredHeight();
+//                height = height - getMeasuredHeight();
+//
+//                // System.out.println("height=" + height);
+//                int scrollY = getScrollY();
+//                // System.out.println("scrollY" + scrollY);
+//                int y = (int)ev.getY();
+//
+//                // 手指向下滑动
+//                if (currentY < y) {
+//                    if (scrollY <= 0) {
+//                        // 如果向下滑动到头，就把滚动交给父Scrollview
+//                        setParentScrollAble(true);
+//                        return false;
+//                    } else {
+//                        setParentScrollAble(false);
+//
+//                    }
+//                } else if (currentY > y) {
+//                    if (scrollY >= height) {
+//                        // 如果向上滑动到头，就把滚动交给父Scrollview
+//                        setParentScrollAble(true);
+//                        return false;
+//                    } else {
+//                        setParentScrollAble(false);
+//
+//                    }
+//
+//                }
+//                currentY = y;
+//            }
+//        }
 
         return super.onTouchEvent(ev);
     }
 
 
-    public void setParentScrollView(ScrollView parentScrollView) {
-        this.parentScrollView = parentScrollView;
+    public void doScroll(MotionEvent m){
+        super.onTouchEvent(m);
     }
 
-    private void setParentScrollAble(boolean flag) {
-
-        parentScrollView.requestDisallowInterceptTouchEvent(!flag);
-    }
 }
