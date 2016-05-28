@@ -2,11 +2,13 @@ package com.guohui.weather;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapRegionDecoder;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -155,6 +157,10 @@ public class MainActivity extends AppCompatActivity {
     TextView tvDetailAirq;
 
 
+    @FindView(R.id.srl_main)
+    SwipeRefreshLayout srlMain;
+
+
     //当前的天气情况
     Weather currentWeather;
 
@@ -164,6 +170,9 @@ public class MainActivity extends AppCompatActivity {
 
     //主ScrollView滑动的距离
     int mainScrollY;
+
+    //正在刷新中
+    boolean refreshing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +185,8 @@ public class MainActivity extends AppCompatActivity {
         viewBlank = findViewById(R.id.view_blank);
         //初始化日期
         initDate();
+
+        initSwipeLayout();
         //加载滑动布局
         initScrollView();
 
@@ -183,38 +194,61 @@ public class MainActivity extends AppCompatActivity {
         initTitleLayout();
 
         //初始化天气预报
-        initWeatherForcast();
+        initWeatherForecast();
 
         //初始化动画效果
         initAnimation();
 
-       updateWeatherFromNet();
+        updateWeatherFromNet();
+    }
+
+    /**
+     * 初始化刷新器
+     */
+    private void initSwipeLayout() {
+        srlMain.setColorSchemeColors(Color.RED, Color.YELLOW, Color.CYAN, Color.GREEN);
+
+        srlMain.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //access net
+                if (!refreshing) {
+                    updateWeatherFromNet();
+                }else {
+                    srlMain.setRefreshing(false);
+                }
+            }
+        });
+
+        srlMain.setEnabled(false);
     }
 
 
     /**
      * 访问天气
      */
-    public void updateWeatherFromNet(){
-        weatherNetHelper = new NormalAsyNet(Config.BAIDU_WEATHER_DETAIL_URL+"changsha", AsyNet.NetMethod.GET);
+    public void updateWeatherFromNet() {
+        weatherNetHelper = new NormalAsyNet(Config.BAIDU_WEATHER_DETAIL_URL + "changsha", AsyNet.NetMethod.GET);
         weatherNetHelper.addHeader("apikey", Config.BAIDU_API_KEY);
         weatherNetHelper.setOnNetStateChangedListener(new AsyNet.OnNetStateChangedListener<String>() {
             @Override
             public void beforeAccessNet() {
-
+                refreshing = true;
             }
 
             @Override
             public void afterAccessNet(String result) {
-                Log.e("weather", result);
+                srlMain.setRefreshing(false);
+                refreshing = false;
+//                Log.e("weather", result);
                 if (result != null) {
                     if (result.startsWith("{")) {
                         currentWeather = new Weather(result);
+//                        Log.e("hour",currentWeather.getHourly_forecast().toString());
                         updateWeatherUi();
-                    }else {
-                        AlertUtil.toastMess(MainActivity.this,"远程服务器异常");
+                    } else {
+                        AlertUtil.toastMess(MainActivity.this, "远程服务器异常");
                     }
-
 
 
 //                    updateWeatherUi();
@@ -224,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void whenException() {
-
+                refreshing = false;
             }
 
             @Override
@@ -258,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void updateWeatherUi() {
         //设置天气预报
-        initWeatherForcast();
+        initWeatherForecast();
         //设置城市名称
         tvCityName.setText(currentWeather.getBasic().getCity());
         //设置当前天气情况
@@ -305,11 +339,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-    private void initWeatherForcast() {
+    private void initWeatherForecast() {
 
         llWeatherHourly.removeAllViews();
         llWeatherForcast.removeAllViews();
+
         if (currentWeather == null) {
             for (int i = 1; i <= 7; i++) {
                 llWeatherForcast.addView(new DailyForecastView(this, Util.getWeekDay(i), (20 + i) + "", (20 - i) + "").getView());
@@ -331,17 +365,19 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i = 1; i < currentWeather.getDaily_forecast().size(); i++) {
                 DailyForecast f = currentWeather.getDaily_forecast().get(i);
-                llWeatherForcast.addView(new DailyForecastView(this, Util.getWeekDay((calendar.get(Calendar.DAY_OF_WEEK) + i) % 7), f.getTmp().getMax(), f.getTmp().getMin(), CondIcons.getIconDrawable(this,currentWeather.getDaily_forecast().get(i).getCond().getCode_d())).getView());
+                llWeatherForcast.addView(new DailyForecastView(this, Util.getWeekDay((calendar.get(Calendar.DAY_OF_WEEK) + i) % 7), f.getTmp().getMax(), f.getTmp().getMin(), CondIcons.getIconDrawable(this, currentWeather.getDaily_forecast().get(i).getCond().getCode_d())).getView());
             }
 
             for (int i = 0; i < currentWeather.getHourly_forecast().size(); i++) {
-                if (i == 0) {
-                    HourlyForecast h = currentWeather.getHourly_forecast().get(i);
-                    llWeatherHourly.addView(new HourlyForecastView(this, "现在", h.getTmp()).getView());
-                    continue;
-                }
                 HourlyForecast h = currentWeather.getHourly_forecast().get(i);
-                llWeatherHourly.addView(new HourlyForecastView(this, h.getDate().substring(h.getDate().length() - 5, h.getDate().length()), h.getTmp(),CondIcons.getIconDrawable(this,currentWeather.getDaily_forecast().get(0).getCond().getCode_d())).getView());
+                HourlyForecastView v = null;
+                if (i == 0) {
+                    v = new HourlyForecastView(this,"现在",h.getTmp());
+                }else {
+                    v = new HourlyForecastView(this, h.getDate().substring(h.getDate().length() - 5, h.getDate().length()),h.getTmp());
+                }
+                v.setImage(CondIcons.getIconDrawable(this, currentWeather.getDaily_forecast().get(0).getCond().getCode_d()));
+                llWeatherHourly.addView(v.getView());
             }
         }
 
@@ -406,7 +442,11 @@ public class MainActivity extends AppCompatActivity {
         svMain.setScrollChangedCallback(new CustomScrollView.OnScrollChangedCallback() {
             @Override
             public void onScrollChanged(CustomScrollView scrollView, int x, int y, int oldX, int oldY) {
-
+                if (scrollView.getScrollY()==0){
+                    srlMain.setEnabled(true);
+                }else {
+                    srlMain.setEnabled(false);
+                }
                 ((RelativeLayout.LayoutParams) rlWeatherByHour.getLayoutParams()).setMargins(0, 0, 0, 0);
 //                svMore.
                 if (startHsvY == -1) {
@@ -465,9 +505,6 @@ public class MainActivity extends AppCompatActivity {
                 if (mainScrollY > startHsvY) {
                     viewHourlyBlank.setY(mainScrollY);
                     if (!seted) {
-//                        setImageRegion(ivHourly, left, top);
-//                        ivHourly.setImageResource(R.drawable.sun);
-//                        viewBlank.setVisibility(View.GONE);
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getWindowManager().getDefaultDisplay().getHeight() - top - rlWeatherByHour.getHeight());
                         svMore.setLayoutParams(params);
                         seted = true;

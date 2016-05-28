@@ -21,9 +21,9 @@
 
     <ImageView
         android:id="@+id/iv_hour_item_image"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_width="24dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="24dp"
         android:src="@drawable/ic_wb_cloudy_black_24dp" />
 
 

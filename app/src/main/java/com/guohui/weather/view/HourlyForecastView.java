@@ -28,10 +28,7 @@ public class HourlyForecastView {
     View view;
 
     public HourlyForecastView(Context context, String time, String temp,int resourceId){
-        view= LayoutInflater.from(context).inflate(R.layout.hourly_forecast_item_view,null);
-        SimpifyUtil.findAllViews(this,view);
-        tvDay.setText(time);
-        tvTemp.setText(temp);
+        this(context,time,temp);
         ivDay.setImageResource(resourceId);
     }
     public HourlyForecastView(Context context, String time, String temp){
@@ -39,6 +36,10 @@ public class HourlyForecastView {
         SimpifyUtil.findAllViews(this,view);
         tvDay.setText(time);
         tvTemp.setText(temp);
+    }
+
+    public void setImage(int resourceId){
+        ivDay.setImageResource(resourceId);
     }
 
 
