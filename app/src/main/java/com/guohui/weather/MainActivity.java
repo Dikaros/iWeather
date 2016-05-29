@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
         initWeatherForecast();
 
         //初始化动画效果
-        initAnimation();
+//        initAnimation();
 
         updateWeatherFromNet();
     }
