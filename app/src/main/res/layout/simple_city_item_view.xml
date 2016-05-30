@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+    android:background="@color/black"
+    android:layout_height="128dp">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tv_item_update_time"
+            android:layout_width="wrap_content"
+            android:text="12:00"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tv_item_city"
+            android:layout_width="wrap_content"
+            android:text="长沙市"
+            android:layout_marginTop="5dp"
+            android:textSize="36sp"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_city_item_tmp"
+        android:layout_width="wrap_content"
+        android:textSize="58sp"
+        android:fontFamily="sans-serif-thin"
+        android:padding="20dp"
+        android:text="30°"
+        android:textColor="@color/white"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

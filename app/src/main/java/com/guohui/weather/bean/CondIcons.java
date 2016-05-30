@@ -2,16 +2,13 @@ package com.guohui.weather.bean;
 
 import android.content.Context;
 
-import com.google.gson.Gson;
 import com.guohui.weather.R;
 import com.guohui.weather.util.Util;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;

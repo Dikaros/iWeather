@@ -1,5 +1,8 @@
 package com.guohui.weather;
 
+import com.guohui.weather.bean.City;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -31,4 +34,12 @@ public class Config {
      */
     public final static String BAIDU_WEATHER_DETAIL_URL = "http://apis.baidu.com/heweather/pro/weather?city=";
 
+    private static ArrayList<City> cities = new ArrayList<>();
+
+    public static ArrayList<City> getCities(){
+        if (cities.size()==0){
+
+        }
+        return cities;
+    }
 }

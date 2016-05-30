@@ -1,3 +1,4 @@
+
 package com.guohui.weather.util;
 
 import android.content.Context;
@@ -41,31 +42,32 @@ public class Util {
 
     /**
      * 通过drawable的名字获取其id（通过反射）
+     *
      * @param name drawable名
      * @return id
-     *
      */
-    public static int getDrawableByName(String name){
+    public static int getDrawableByName(String name) {
         int id = -1;
         Class drawable = R.drawable.class;
         Field field = null;
-        try{
+        try {
             field = drawable.getField(name);
             id = field.getInt(field.getName());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return  id;
+        return id;
     }
 
     /**
      * 获取星期数
+     *
      * @param dayOfWeek
      * @return
      */
-    public static String getWeekDay(int dayOfWeek){
-        switch (dayOfWeek){
+    public static String getWeekDay(int dayOfWeek) {
+        switch (dayOfWeek) {
             case 1:
                 return "星期日";
             case 2:

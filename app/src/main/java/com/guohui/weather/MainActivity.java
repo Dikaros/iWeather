@@ -1,27 +1,17 @@
 package com.guohui.weather;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapRegionDecoder;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.dikaros.asynet.AsyNet;
@@ -39,7 +29,6 @@ import com.guohui.weather.view.DailyForecastView;
 import com.guohui.weather.view.HourlyForecastView;
 import com.guohui.weather.view.InnerScrollView;
 
-import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 
