@@ -2,7 +2,9 @@
 package com.guohui.weather.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
+import com.guohui.weather.Config;
 import com.guohui.weather.R;
 
 import java.lang.reflect.Field;
@@ -85,4 +87,35 @@ public class Util {
         }
         return null;
     }
+
+    /**
+     * 设置preference
+     *
+     * @param context
+     * @param key
+     * @param token
+     */
+    public static void setPreference(Context context, String key, String token) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Config.APP_ID,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(key, token);
+        editor.commit();
+
+    }
+
+
+    /**
+     * 获取Preference
+     *
+     * @param context
+     * @param key
+     * @return
+     */
+    public static String getPreference(Context context, String key) {
+        return context
+                .getSharedPreferences(Config.APP_ID, Context.MODE_PRIVATE)
+                .getString(key, null);
+    }
+
 }

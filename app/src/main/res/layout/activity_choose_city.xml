@@ -5,6 +5,11 @@
     android:layout_height="match_parent"
     android:background="#c111"
     tools:context="com.guohui.weather.ChooseCityActivity">
+    <ProgressBar
+        android:id="@+id/pBar"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     <LinearLayout
         android:id="@+id/ll_choose_city"
         android:layout_width="match_parent"

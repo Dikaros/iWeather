@@ -1,6 +1,7 @@
 package com.guohui.weather;
 
 import com.guohui.weather.bean.City;
+import com.guohui.weather.bean.Weather;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,4 +43,13 @@ public class Config {
         }
         return cities;
     }
+
+    public static HashMap<Integer,Weather> currentCityMap = new HashMap<>();
+
+    public static String APP_ID = "com.dikaros.iweather";
+
+    /**
+     * 注册的天气
+     */
+    public static String KEY_REGISTED_WEATHER = "iweather.register";
 }
