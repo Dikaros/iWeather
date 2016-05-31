@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +33,12 @@ import com.guohui.weather.view.CustomScrollView;
 import com.guohui.weather.view.DailyForecastView;
 import com.guohui.weather.view.HourlyForecastView;
 import com.guohui.weather.view.InnerScrollView;
+import com.guohui.weather.view.LineView;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -157,6 +161,10 @@ public class WeatherFragment extends Fragment {
     @FindView(R.id.srl_main)
     SwipeRefreshLayout srlMain;
 
+    @FindView(R.id.lineViewMax)
+    LineView lineViewMax;
+
+
 
     //当前的天气情况
     Weather currentWeather;
@@ -177,7 +185,7 @@ public class WeatherFragment extends Fragment {
     }
 
     //默认城市
-    String city = "changsha";
+    String city = "长沙";
 
     public void setCity(int index,String city) {
         this.city = city;
@@ -210,6 +218,20 @@ public class WeatherFragment extends Fragment {
 
         //初始化动画效果
 //        initAnimation();
+
+        Set<String> stringSet = Util.getPreferenceSet(getContext(),Config.KEY_REMEMBERED_WEATHER);
+        if (stringSet!=null){
+//            stringSet.iterator()
+            while (stringSet.iterator().hasNext()){
+                String w = stringSet.iterator().next();
+                Weather wea = new Weather(w);
+                if (wea.getBasic().getCity().equals(city)){
+                    currentWeather = wea;
+                    updateWeatherUi();
+                    break;
+                }
+            }
+        }
 
         updateWeatherFromNet();
 
@@ -260,6 +282,12 @@ public class WeatherFragment extends Fragment {
                         currentWeather = new Weather(result);
                         Config.currentCityMap.put(index,currentWeather);
 //                        Log.e("hour",currentWeather.getHourly_forecast().toString());
+                        Set<String> weatherSet = Util.getPreferenceSet(getContext(),Config.KEY_REMEMBERED_WEATHER);
+                        if (weatherSet==null){
+                            weatherSet = new HashSet<String>();
+                            weatherSet.add(result);
+                        }
+                        Util.setPreferenceSet(getContext(),Config.KEY_REMEMBERED_WEATHER,weatherSet);
                         updateWeatherUi();
                     } else {
                         AlertUtil.toastMess(getContext(), "远程服务器异常");
@@ -351,6 +379,7 @@ public class WeatherFragment extends Fragment {
         tvDetailAirq.setText(currentWeather.getAqi().getQlty());
 
 
+
     }
 
 
@@ -360,6 +389,7 @@ public class WeatherFragment extends Fragment {
         llWeatherForcast.removeAllViews();
 
         if (currentWeather == null) {
+
             for (int i = 1; i <= 7; i++) {
                 llWeatherForcast.addView(new DailyForecastView(getContext(), Util.getWeekDay(i), (20 + i) + "", (20 - i) + "").getView());
             }
@@ -377,14 +407,29 @@ public class WeatherFragment extends Fragment {
                 }
             }
         } else {
-
+            lineViewMax.clear();
+            int maxPY = Util.dip2px(getContext(),60);
             for (int i = 1; i < currentWeather.getDaily_forecast().size(); i++) {
                 DailyForecast f = currentWeather.getDaily_forecast().get(i);
                 llWeatherForcast.addView(new DailyForecastView(getContext(), Util.getWeekDay((calendar.get(Calendar.DAY_OF_WEEK) + i) % 7), f.getTmp().getMax(), f.getTmp().getMin(), CondIcons.getIconDrawable(getContext(), currentWeather.getDaily_forecast().get(i).getCond().getCode_d())).getView());
             }
 
+            int mX = 60;
+            int mY =0;
+
+            int max = -100;
+            int min = 100;
             for (int i = 0; i < currentWeather.getHourly_forecast().size(); i++) {
                 HourlyForecast h = currentWeather.getHourly_forecast().get(i);
+//                lineViewMax.setLinePoint(Util.dip2px(getContext(),50)*(i-1), (int) (maxPY- maxPY/40f*Integer.parseInt(h.getTmp())));
+                int tmp = Integer.parseInt(h.getTmp());
+                if (tmp>max){
+                    max=tmp;
+                }
+
+                if (tmp<min){
+                    min = tmp;
+                }
                 HourlyForecastView v = null;
                 if (i == 0) {
                     v = new HourlyForecastView(getContext(),"现在",h.getTmp());
@@ -394,6 +439,16 @@ public class WeatherFragment extends Fragment {
                 v.setImage(CondIcons.getIconDrawable(getContext(), currentWeather.getDaily_forecast().get(0).getCond().getCode_d()));
                 llWeatherHourly.addView(v.getView());
             }
+
+            //最大温度和最小温度之间的差值
+            int offset = max-min+1;
+            for (int index=0; index<currentWeather.getHourly_forecast().size(); index++)
+            {
+                HourlyForecast h = currentWeather.getHourly_forecast().get(index);
+                int l = Integer.parseInt(h.getTmp());
+                lineViewMax.setLinePoint(mX*(index-1),(l-min)*maxPY/offset);
+            }
+
         }
 
 

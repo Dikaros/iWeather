@@ -52,4 +52,6 @@ public class Config {
      * 注册的天气
      */
     public static String KEY_REGISTED_WEATHER = "iweather.register";
+
+    public static String KEY_REMEMBERED_WEATHER ="iweather.weather";
 }

@@ -8,6 +8,7 @@ import com.guohui.weather.Config;
 import com.guohui.weather.R;
 
 import java.lang.reflect.Field;
+import java.util.Set;
 
 /**
  * Created by Dikaros on 2016/5/22.
@@ -102,6 +103,19 @@ public class Util {
         editor.putString(key, token);
         editor.commit();
 
+    }
+
+    public static void setPreferenceSet(Context context, String key, Set<String> set){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Config.APP_ID,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putStringSet(key,set);
+        editor.commit();
+    }
+
+    public static Set<String> getPreferenceSet(Context context, String key){
+        return context
+                .getSharedPreferences(Config.APP_ID, Context.MODE_PRIVATE).getStringSet(key,null);
     }
 
 
