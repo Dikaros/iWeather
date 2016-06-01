@@ -49,6 +49,10 @@ public class CityActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }
+
+                @Override
+                public void onViewLongClicked(View v, int index) {
+                }
             });
 
         }

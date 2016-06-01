@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -39,6 +40,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Handler;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -273,22 +275,29 @@ public class WeatherFragment extends Fragment {
             }
 
             @Override
-            public void afterAccessNet(String result) {
+            public void afterAccessNet(final String result) {
                 srlMain.setRefreshing(false);
                 refreshing = false;
 //                Log.e("weather", result);
                 if (result != null) {
                     if (result.startsWith("{")) {
-                        currentWeather = new Weather(result);
-                        Config.currentCityMap.put(index,currentWeather);
+                        new Thread(){
+                            @Override
+                            public void run() {
+                                currentWeather = new Weather(result);
+                                Config.currentCityMap.put(index,currentWeather);
 //                        Log.e("hour",currentWeather.getHourly_forecast().toString());
-                        Set<String> weatherSet = Util.getPreferenceSet(getContext(),Config.KEY_REMEMBERED_WEATHER);
-                        if (weatherSet==null){
-                            weatherSet = new HashSet<String>();
-                            weatherSet.add(result);
-                        }
-                        Util.setPreferenceSet(getContext(),Config.KEY_REMEMBERED_WEATHER,weatherSet);
-                        updateWeatherUi();
+                                Set<String> weatherSet = Util.getPreferenceSet(getContext(),Config.KEY_REMEMBERED_WEATHER);
+                                if (weatherSet==null){
+                                    weatherSet = new HashSet<String>();
+                                    weatherSet.add(result);
+                                }
+                                Util.setPreferenceSet(getContext(),Config.KEY_REMEMBERED_WEATHER,weatherSet);
+                                handler.sendEmptyMessage(1);
+                            }
+                        }.start();
+
+
                     } else {
                         AlertUtil.toastMess(getContext(), "远程服务器异常");
                     }
@@ -313,6 +322,15 @@ public class WeatherFragment extends Fragment {
         weatherNetHelper.execute();
     }
 
+
+     android.os.Handler handler = new android.os.Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what==1){
+                updateWeatherUi();
+            }
+        }
+    };
     private void initAnimation() {
         AnimationDrawable d = (AnimationDrawable) rlRoot.getBackground();
         d.start();
@@ -414,7 +432,7 @@ public class WeatherFragment extends Fragment {
                 llWeatherForcast.addView(new DailyForecastView(getContext(), Util.getWeekDay((calendar.get(Calendar.DAY_OF_WEEK) + i) % 7), f.getTmp().getMax(), f.getTmp().getMin(), CondIcons.getIconDrawable(getContext(), currentWeather.getDaily_forecast().get(i).getCond().getCode_d())).getView());
             }
 
-            int mX = 60;
+            int mX = getActivity().getWindowManager().getDefaultDisplay().getWidth()/24;
             int mY =0;
 
             int max = -100;
@@ -441,12 +459,15 @@ public class WeatherFragment extends Fragment {
             }
 
             //最大温度和最小温度之间的差值
-            int offset = max-min+1;
+            int offset = max-min;
             for (int index=0; index<currentWeather.getHourly_forecast().size(); index++)
             {
                 HourlyForecast h = currentWeather.getHourly_forecast().get(index);
                 int l = Integer.parseInt(h.getTmp());
-                lineViewMax.setLinePoint(mX*(index-1),(l-min)*maxPY/offset);
+//                Log.d(index+"温度",l+"--"+min+"--"+max+"/"+(l-min)*maxPY/offset);
+                //max =31 min = 20  12
+
+                lineViewMax.setLinePoint(mX*(index-1),(maxPY- (l-min)*maxPY/offset));
             }
 
         }

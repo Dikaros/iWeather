@@ -31,6 +31,7 @@ public class CitySimpleView {
 
     public interface OnViewClickListener{
         public void onViewClicked(View v,int index);
+        public void onViewLongClicked(View v,int index);
     }
 
     OnViewClickListener onViewClickListener;
@@ -53,6 +54,16 @@ public class CitySimpleView {
                     onViewClickListener.onViewClicked(v,index);
                 }
 
+            }
+        });
+
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (onViewClickListener!=null){
+                    onViewClickListener.onViewLongClicked(v,index);
+                }
+                return false;
             }
         });
     }
