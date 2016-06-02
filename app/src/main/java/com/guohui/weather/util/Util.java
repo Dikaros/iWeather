@@ -3,6 +3,8 @@ package com.guohui.weather.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.guohui.weather.Config;
 import com.guohui.weather.R;
@@ -131,5 +133,33 @@ public class Util {
                 .getSharedPreferences(Config.APP_ID, Context.MODE_PRIVATE)
                 .getString(key, null);
     }
+
+
+    /**
+     * 获取网络状态
+     * @param context
+     * @return
+     */
+    public static boolean isNetworkAvailable(Context context) {
+
+        ConnectivityManager connectivity = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity == null) {
+            return false;
+        } else {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null) {
+
+                for (int i = 0; i < info.length; i++) {
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+                        return true;
+                    }
+                }
+
+            }
+        }
+        return false;
+    }
+
 
 }

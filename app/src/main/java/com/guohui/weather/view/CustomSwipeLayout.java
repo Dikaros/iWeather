@@ -1,6 +1,7 @@
 package com.guohui.weather.view;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -29,6 +30,8 @@ public class CustomSwipeLayout extends SwipeRefreshLayout {
     }
 
     public void setRefreshable(boolean refreshable) {
+
         this.refreshable = refreshable;
     }
+
 }

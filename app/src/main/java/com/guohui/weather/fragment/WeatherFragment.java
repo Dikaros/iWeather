@@ -29,6 +29,7 @@ import com.guohui.weather.bean.DailyForecast;
 import com.guohui.weather.bean.HourlyForecast;
 import com.guohui.weather.bean.Weather;
 import com.guohui.weather.util.AlertUtil;
+import com.guohui.weather.util.DbUtil;
 import com.guohui.weather.util.Util;
 import com.guohui.weather.view.CustomScrollView;
 import com.guohui.weather.view.DailyForecastView;
@@ -196,6 +197,8 @@ public class WeatherFragment extends Fragment {
 
     int index = 0;
 
+    long lastRefreshTime = 0;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -221,23 +224,43 @@ public class WeatherFragment extends Fragment {
         //初始化动画效果
 //        initAnimation();
 
-        Set<String> stringSet = Util.getPreferenceSet(getContext(),Config.KEY_REMEMBERED_WEATHER);
-        if (stringSet!=null){
-//            stringSet.iterator()
-            while (stringSet.iterator().hasNext()){
-                String w = stringSet.iterator().next();
-                Weather wea = new Weather(w);
-                if (wea.getBasic().getCity().equals(city)){
-                    currentWeather = wea;
-                    updateWeatherUi();
-                    break;
-                }
-            }
+//        Set<String> stringSet = Util.getPreferenceSet(getContext(),Config.KEY_REMEMBERED_WEATHER);
+//        if (stringSet!=null){
+////            stringSet.iterator()
+//            while (stringSet.iterator().hasNext()){
+//                String w = stringSet.iterator().next();
+//                Weather wea = new Weather(w);
+//                if (wea.getBasic().getCity().equals(city)){
+//                    currentWeather = wea;
+//                    updateWeatherUi();
+//                    break;
+//                }
+//            }
+//        }
+        //无网络的情况下使用
+        if (!Util.isNetworkAvailable(getContext())) {
+            updateWeatherWhenNoNet();
+        }else {
+            updateWeatherFromNet();
         }
 
-        updateWeatherFromNet();
 
         return v;
+    }
+
+    private void updateWeatherWhenNoNet() {
+       final String we =  DbUtil.getInstance(getContext()).getCityWeather(city);
+        if (we!=null){
+            new Thread(new Thread()){
+                @Override
+                public void run() {
+                    currentWeather = new Weather(we);
+                    handler.sendEmptyMessage(1);
+                }
+
+
+            }.start();
+        }
     }
 
     /**
@@ -249,8 +272,8 @@ public class WeatherFragment extends Fragment {
         srlMain.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                //access net
-                if (!refreshing) {
+                //access net,距离上次刷新大于5s的话继续
+                if (!refreshing&&System.currentTimeMillis()>lastRefreshTime+5000) {
                     updateWeatherFromNet();
                 }else {
                     srlMain.setRefreshing(false);
@@ -271,6 +294,7 @@ public class WeatherFragment extends Fragment {
         weatherNetHelper.setOnNetStateChangedListener(new AsyNet.OnNetStateChangedListener<String>() {
             @Override
             public void beforeAccessNet() {
+                lastRefreshTime =  System.currentTimeMillis();
                 refreshing = true;
             }
 
@@ -286,13 +310,11 @@ public class WeatherFragment extends Fragment {
                             public void run() {
                                 currentWeather = new Weather(result);
                                 Config.currentCityMap.put(index,currentWeather);
-//                        Log.e("hour",currentWeather.getHourly_forecast().toString());
-                                Set<String> weatherSet = Util.getPreferenceSet(getContext(),Config.KEY_REMEMBERED_WEATHER);
-                                if (weatherSet==null){
-                                    weatherSet = new HashSet<String>();
-                                    weatherSet.add(result);
+                                if (DbUtil.getInstance(getContext()).contains(city)){
+                                    DbUtil.getInstance(getContext()).updateCityWeather(city,result);
+                                }else {
+                                    DbUtil.getInstance(getContext()).addCityWeather(city,result);
                                 }
-                                Util.setPreferenceSet(getContext(),Config.KEY_REMEMBERED_WEATHER,weatherSet);
                                 handler.sendEmptyMessage(1);
                             }
                         }.start();
