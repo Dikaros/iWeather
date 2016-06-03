@@ -240,6 +240,7 @@ public class WeatherFragment extends Fragment {
         //无网络的情况下使用
         if (!Util.isNetworkAvailable(getContext())) {
             updateWeatherWhenNoNet();
+            AlertUtil.toastMess(getContext(),"无网络连接");
         }else {
             updateWeatherFromNet();
         }
@@ -250,6 +251,7 @@ public class WeatherFragment extends Fragment {
 
     private void updateWeatherWhenNoNet() {
        final String we =  DbUtil.getInstance(getContext()).getCityWeather(city);
+        Log.e("city",we+"");
         if (we!=null){
             new Thread(new Thread()){
                 @Override
@@ -311,9 +313,11 @@ public class WeatherFragment extends Fragment {
                                 currentWeather = new Weather(result);
                                 Config.currentCityMap.put(index,currentWeather);
                                 if (DbUtil.getInstance(getContext()).contains(city)){
-                                    DbUtil.getInstance(getContext()).updateCityWeather(city,result);
+                                    boolean r = DbUtil.getInstance(getContext()).updateCityWeather(city,result);
+                                    Log.e("updateDb",r+"");
                                 }else {
-                                    DbUtil.getInstance(getContext()).addCityWeather(city,result);
+                                    boolean l = DbUtil.getInstance(getContext()).addCityWeather(city,result);
+                                    Log.e("addDb",l+"");
                                 }
                                 handler.sendEmptyMessage(1);
                             }
@@ -374,6 +378,8 @@ public class WeatherFragment extends Fragment {
      * 更新天气UI
      */
     public void updateWeatherUi() {
+        Log.e("currentWeather",currentWeather.toString());
+
         //设置天气预报
         initWeatherForecast();
         //设置城市名称

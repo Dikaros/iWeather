@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class WeatherDbHelper extends SQLiteOpenHelper {
 
-    public static final String CREATE_TABLE="CREATE TABLE weather (_id INTEGER PRIMARY KEY AUTOINCREMENT, city TEXT UNIQUE, weather_msg TEXT)";
+    public static final String CREATE_TABLE="CREATE TABLE weather (_id INTEGER PRIMARY KEY AUTOINCREMENT, city TEXT, weather_msg TEXT)";
 
     public WeatherDbHelper(Context context) {
         super(context, "weather.db", null, 1);

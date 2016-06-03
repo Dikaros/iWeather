@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             String cityJson = Util.getPreference(this,Config.KEY_REGISTED_WEATHER);
             if (cityJson==null){
                 WeatherFragment changsha = new WeatherFragment();
-                changsha.setCity(0,"changsha");
+                changsha.setCity(0,"长沙");
                 fragments.add(changsha);
             }else {
                 JSONArray array = null;
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         Log.e("cityJson",cityJson+"");
         if (cityJson==null){
             WeatherFragment changsha = new WeatherFragment();
-            changsha.setCity(0,"changsha");
+            changsha.setCity(0,"长沙");
             fragments.add(changsha);
         }else {
             JSONArray array = new JSONArray(cityJson);

@@ -1,5 +1,6 @@
 package com.guohui.weather;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +13,15 @@ import android.widget.LinearLayout;
 import com.dikaros.simplifyfindwidget.SimpifyUtil;
 import com.dikaros.simplifyfindwidget.annotation.FindView;
 import com.guohui.weather.bean.Weather;
+import com.guohui.weather.util.AlertUtil;
+import com.guohui.weather.util.DbUtil;
+import com.guohui.weather.util.Util;
 import com.guohui.weather.view.CitySimpleView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.util.ArrayList;
 
 public class CityActivity extends AppCompatActivity {
 
@@ -49,9 +58,40 @@ public class CityActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }
+                //第12次，修复bug，增加删除定制天气
 
                 @Override
-                public void onViewLongClicked(View v, int index) {
+                public void onViewLongClicked(View v, final int index) {
+                    AlertUtil.judgeAlertDialog(CityActivity.this, "提醒","是否要移除当前城市天气", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String cityJson = Util.getPreference(CityActivity.this,Config.KEY_REGISTED_WEATHER);
+                            try {
+                                JSONArray array = new JSONArray(cityJson);
+                                String c = array.getString(index);
+                                DbUtil.getInstance(CityActivity.this).removeCityWeather(c);
+                                ArrayList<String> arrayList = new ArrayList<String>();
+                                for (int i=0;i<array.length();i++){
+                                    if (index!=i) {
+                                        arrayList.add(array.getString(i));
+                                    }
+                                }
+
+                                JSONArray newArray = new JSONArray(arrayList);
+                                Util.setPreference(CityActivity.this,Config.KEY_REGISTED_WEATHER,newArray.toString());
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+
+                        }
+                    }, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
                 }
             });
 
