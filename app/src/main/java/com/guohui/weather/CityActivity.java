@@ -83,8 +83,12 @@ public class CityActivity extends AppCompatActivity {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
-
+                            Config.currentCityMap.remove(index);
+                            llCityList.removeViewAt(index);
+                            Intent intent = new Intent(CityActivity.this,MainActivity.class);
+                            intent.putExtra("restart",true);
+                            startActivity(intent);
+                            finish();
                         }
                     }, new DialogInterface.OnClickListener() {
                         @Override

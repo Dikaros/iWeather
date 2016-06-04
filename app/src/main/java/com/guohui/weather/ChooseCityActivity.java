@@ -179,6 +179,7 @@ public class ChooseCityActivity extends AppCompatActivity {
                 }
                 Intent intent = new Intent(ChooseCityActivity.this,MainActivity.class);
                 intent.putExtra("restart",true);
+                intent.putExtra("city",city);
                 startActivity(intent);
                 finish();
             }

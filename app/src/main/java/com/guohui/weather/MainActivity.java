@@ -1,52 +1,25 @@
 package com.guohui.weather;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.AnimationDrawable;
-import android.net.ConnectivityManager;
 import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import com.dikaros.asynet.AsyNet;
-import com.dikaros.asynet.NormalAsyNet;
 import com.dikaros.simplifyfindwidget.SimpifyUtil;
 import com.dikaros.simplifyfindwidget.annotation.FindView;
-import com.guohui.weather.bean.City;
-import com.guohui.weather.bean.CondIcons;
-import com.guohui.weather.bean.DailyForecast;
-import com.guohui.weather.bean.HourlyForecast;
-import com.guohui.weather.bean.Weather;
 import com.guohui.weather.fragment.WeatherFragment;
-import com.guohui.weather.util.AlertUtil;
 import com.guohui.weather.util.Util;
-import com.guohui.weather.view.CustomScrollView;
-import com.guohui.weather.view.DailyForecastView;
-import com.guohui.weather.view.HourlyForecastView;
-import com.guohui.weather.view.InnerScrollView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -88,30 +61,38 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         int jumpPage = getIntent().getIntExtra("city",0);
-        boolean restart = getIntent().getBooleanExtra("restart",false);
+
+        viewPager.setCurrentItem(jumpPage,false);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        boolean restart = intent.getBooleanExtra("restart",false);
         if (restart){
+            Log.i("restart","重启");
             fragments.clear();
             String cityJson = Util.getPreference(this,Config.KEY_REGISTED_WEATHER);
             if (cityJson==null){
-                WeatherFragment changsha = new WeatherFragment();
-                changsha.setCity(0,"长沙");
+                WeatherFragment changsha = WeatherFragment.getInstance(0,"长沙");
                 fragments.add(changsha);
+                fPagerAdapter.notifyDataSetChanged();
+
             }else {
                 JSONArray array = null;
                 try {
                     array = new JSONArray(cityJson);
                     for (int i=0;i<array.length();i++){
-                        WeatherFragment f = new WeatherFragment();
-                        f.setCity(i,array.getString(i));
+                        WeatherFragment f = WeatherFragment.getInstance(i,array.getString(i));
                         fragments.add(f);
                     }
+                    fPagerAdapter.notifyDataSetChanged();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
             }
         }
-        viewPager.setCurrentItem(jumpPage,false);
     }
 
     private void initViewPager() throws JSONException {
@@ -131,14 +112,12 @@ public class MainActivity extends AppCompatActivity {
         String cityJson = Util.getPreference(this,Config.KEY_REGISTED_WEATHER);
         Log.e("cityJson",cityJson+"");
         if (cityJson==null){
-            WeatherFragment changsha = new WeatherFragment();
-            changsha.setCity(0,"长沙");
+            WeatherFragment changsha = WeatherFragment.getInstance(0,"长沙");
             fragments.add(changsha);
         }else {
             JSONArray array = new JSONArray(cityJson);
             for (int i=0;i<array.length();i++){
-                WeatherFragment f = new WeatherFragment();
-                f.setCity(i,array.getString(i));
+                WeatherFragment f =WeatherFragment.getInstance(i,array.getString(i));
                 fragments.add(f);
             }
         }

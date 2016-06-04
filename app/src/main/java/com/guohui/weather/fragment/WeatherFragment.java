@@ -6,6 +6,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -168,7 +169,6 @@ public class WeatherFragment extends Fragment {
     LineView lineViewMax;
 
 
-
     //当前的天气情况
     Weather currentWeather;
 
@@ -187,10 +187,11 @@ public class WeatherFragment extends Fragment {
         // Required empty public constructor
     }
 
+
     //默认城市
     String city = "长沙";
 
-    public void setCity(int index,String city) {
+    public void setCity(int index, String city) {
         this.city = city;
         this.index = index;
     }
@@ -200,11 +201,21 @@ public class WeatherFragment extends Fragment {
     long lastRefreshTime = 0;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+            city = getArguments().getString(EXTRA_CITY);
+            index =getArguments().getInt(EXTRA_INDEX);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for getContext() fragment
         View v = inflater.inflate(R.layout.fragment_weather, container, false);
-        SimpifyUtil.findAllViews(this,v);
+
+        SimpifyUtil.findAllViews(this, v);
+
         //为声明的view findId
         viewHourlyBlank = v.findViewById(R.id.view_blank_hourly);
         viewBlank = v.findViewById(R.id.view_blank);
@@ -240,8 +251,8 @@ public class WeatherFragment extends Fragment {
         //无网络的情况下使用
         if (!Util.isNetworkAvailable(getContext())) {
             updateWeatherWhenNoNet();
-            AlertUtil.toastMess(getContext(),"无网络连接");
-        }else {
+            AlertUtil.toastMess(getContext(), "无网络连接"+city);
+        } else {
             updateWeatherFromNet();
         }
 
@@ -250,13 +261,14 @@ public class WeatherFragment extends Fragment {
     }
 
     private void updateWeatherWhenNoNet() {
-       final String we =  DbUtil.getInstance(getContext()).getCityWeather(city);
-        Log.e("city",we+"");
-        if (we!=null){
-            new Thread(new Thread()){
+        final String we = DbUtil.getInstance(getContext()).getCityWeather(city);
+        Log.e("city", city + "--" + we + "");
+        if (we != null) {
+            new Thread(new Thread()) {
                 @Override
                 public void run() {
                     currentWeather = new Weather(we);
+
                     handler.sendEmptyMessage(1);
                 }
 
@@ -275,9 +287,9 @@ public class WeatherFragment extends Fragment {
             @Override
             public void onRefresh() {
                 //access net,距离上次刷新大于5s的话继续
-                if (!refreshing&&System.currentTimeMillis()>lastRefreshTime+5000) {
+                if (!refreshing && System.currentTimeMillis() > lastRefreshTime + 3000) {
                     updateWeatherFromNet();
-                }else {
+                } else {
                     srlMain.setRefreshing(false);
                 }
             }
@@ -291,12 +303,13 @@ public class WeatherFragment extends Fragment {
      * 访问天气
      */
     public void updateWeatherFromNet() {
+        Log.e("accessNet",city);
         weatherNetHelper = new NormalAsyNet(Config.BAIDU_WEATHER_DETAIL_URL + city, AsyNet.NetMethod.GET);
         weatherNetHelper.addHeader("apikey", Config.BAIDU_API_KEY);
         weatherNetHelper.setOnNetStateChangedListener(new AsyNet.OnNetStateChangedListener<String>() {
             @Override
             public void beforeAccessNet() {
-                lastRefreshTime =  System.currentTimeMillis();
+                lastRefreshTime = System.currentTimeMillis();
                 refreshing = true;
             }
 
@@ -307,17 +320,17 @@ public class WeatherFragment extends Fragment {
 //                Log.e("weather", result);
                 if (result != null) {
                     if (result.startsWith("{")) {
-                        new Thread(){
+                        new Thread() {
                             @Override
                             public void run() {
                                 currentWeather = new Weather(result);
-                                Config.currentCityMap.put(index,currentWeather);
-                                if (DbUtil.getInstance(getContext()).contains(city)){
-                                    boolean r = DbUtil.getInstance(getContext()).updateCityWeather(city,result);
-                                    Log.e("updateDb",r+"");
-                                }else {
-                                    boolean l = DbUtil.getInstance(getContext()).addCityWeather(city,result);
-                                    Log.e("addDb",l+"");
+                                Config.currentCityMap.put(index, currentWeather);
+                                if (DbUtil.getInstance(getContext()).contains(city)) {
+                                    boolean r = DbUtil.getInstance(getContext()).updateCityWeather(city, result);
+                                    Log.e("updateDb", r + "");
+                                } else {
+                                    boolean l = DbUtil.getInstance(getContext()).addCityWeather(city, result);
+                                    Log.e("addDb", l + "");
                                 }
                                 handler.sendEmptyMessage(1);
                             }
@@ -349,14 +362,16 @@ public class WeatherFragment extends Fragment {
     }
 
 
-     android.os.Handler handler = new android.os.Handler(){
+    android.os.Handler handler = new android.os.Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what==1){
+            if (msg.what == 1) {
+                Config.currentCityMap.put(index, currentWeather);
                 updateWeatherUi();
             }
         }
     };
+
     private void initAnimation() {
         AnimationDrawable d = (AnimationDrawable) rlRoot.getBackground();
         d.start();
@@ -378,7 +393,7 @@ public class WeatherFragment extends Fragment {
      * 更新天气UI
      */
     public void updateWeatherUi() {
-        Log.e("currentWeather",currentWeather.toString());
+        Log.e("currentWeather", currentWeather.toString());
 
         //设置天气预报
         initWeatherForecast();
@@ -425,7 +440,6 @@ public class WeatherFragment extends Fragment {
         tvDetailAirq.setText(currentWeather.getAqi().getQlty());
 
 
-
     }
 
 
@@ -454,14 +468,14 @@ public class WeatherFragment extends Fragment {
             }
         } else {
             lineViewMax.clear();
-            int maxPY = Util.dip2px(getContext(),60);
+            int maxPY = Util.dip2px(getContext(), 60);
             for (int i = 1; i < currentWeather.getDaily_forecast().size(); i++) {
                 DailyForecast f = currentWeather.getDaily_forecast().get(i);
                 llWeatherForcast.addView(new DailyForecastView(getContext(), Util.getWeekDay((calendar.get(Calendar.DAY_OF_WEEK) + i) % 7), f.getTmp().getMax(), f.getTmp().getMin(), CondIcons.getIconDrawable(getContext(), currentWeather.getDaily_forecast().get(i).getCond().getCode_d())).getView());
             }
 
-            int mX = getActivity().getWindowManager().getDefaultDisplay().getWidth()/24;
-            int mY =0;
+            int mX = getActivity().getWindowManager().getDefaultDisplay().getWidth() / 24;
+            int mY = 0;
 
             int max = -100;
             int min = 100;
@@ -469,33 +483,32 @@ public class WeatherFragment extends Fragment {
                 HourlyForecast h = currentWeather.getHourly_forecast().get(i);
 //                lineViewMax.setLinePoint(Util.dip2px(getContext(),50)*(i-1), (int) (maxPY- maxPY/40f*Integer.parseInt(h.getTmp())));
                 int tmp = Integer.parseInt(h.getTmp());
-                if (tmp>max){
-                    max=tmp;
+                if (tmp > max) {
+                    max = tmp;
                 }
 
-                if (tmp<min){
+                if (tmp < min) {
                     min = tmp;
                 }
                 HourlyForecastView v = null;
                 if (i == 0) {
-                    v = new HourlyForecastView(getContext(),"现在",h.getTmp());
-                }else {
-                    v = new HourlyForecastView(getContext(), h.getDate().substring(h.getDate().length() - 5, h.getDate().length()),h.getTmp());
+                    v = new HourlyForecastView(getContext(), "现在", h.getTmp());
+                } else {
+                    v = new HourlyForecastView(getContext(), h.getDate().substring(h.getDate().length() - 5, h.getDate().length()), h.getTmp());
                 }
                 v.setImage(CondIcons.getIconDrawable(getContext(), currentWeather.getDaily_forecast().get(0).getCond().getCode_d()));
                 llWeatherHourly.addView(v.getView());
             }
 
             //最大温度和最小温度之间的差值
-            int offset = max-min;
-            for (int index=0; index<currentWeather.getHourly_forecast().size(); index++)
-            {
+            int offset = max - min;
+            for (int index = 0; index < currentWeather.getHourly_forecast().size(); index++) {
                 HourlyForecast h = currentWeather.getHourly_forecast().get(index);
                 int l = Integer.parseInt(h.getTmp());
 //                Log.d(index+"温度",l+"--"+min+"--"+max+"/"+(l-min)*maxPY/offset);
                 //max =31 min = 20  12
 
-                lineViewMax.setLinePoint(mX*(index-1),(maxPY- (l-min)*maxPY/offset));
+                lineViewMax.setLinePoint(mX * (index - 1), (maxPY - (l - min) * maxPY / offset));
             }
 
         }
@@ -539,7 +552,6 @@ public class WeatherFragment extends Fragment {
     int lastMainScrollY;
 
 
-
     /**
      * 加载滑动布局
      */
@@ -554,9 +566,9 @@ public class WeatherFragment extends Fragment {
         svMain.setScrollChangedCallback(new CustomScrollView.OnScrollChangedCallback() {
             @Override
             public void onScrollChanged(CustomScrollView scrollView, int x, int y, int oldX, int oldY) {
-                if (scrollView.getScrollY()==0){
+                if (scrollView.getScrollY() == 0) {
                     srlMain.setEnabled(true);
-                }else {
+                } else {
                     srlMain.setEnabled(false);
                 }
                 ((RelativeLayout.LayoutParams) rlWeatherByHour.getLayoutParams()).setMargins(0, 0, 0, 0);
@@ -617,7 +629,7 @@ public class WeatherFragment extends Fragment {
                 if (mainScrollY > startHsvY) {
                     viewHourlyBlank.setY(mainScrollY);
                     if (!seted) {
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getActivity().getWindowManager().getDefaultDisplay().getHeight() - top - rlWeatherByHour.getHeight()-Util.dip2px(getContext(),44));
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getActivity().getWindowManager().getDefaultDisplay().getHeight() - top - rlWeatherByHour.getHeight() - Util.dip2px(getContext(), 44));
                         svMore.setLayoutParams(params);
                         seted = true;
                         svMain.setIntercept(false);
@@ -654,8 +666,18 @@ public class WeatherFragment extends Fragment {
     }
 
     boolean seted = false;
+    private static final String EXTRA_CITY = "city";
+    private static final String EXTRA_INDEX = "index";
 
+    public static WeatherFragment getInstance(int index,String city) {
+        WeatherFragment weatherFragment = new WeatherFragment();
+        Bundle args = new Bundle();
+        args.putInt(EXTRA_INDEX,index);
+        args.putString(EXTRA_CITY,city);
+        weatherFragment.setArguments(args);
+        return weatherFragment;
 
+    }
 
 
 }

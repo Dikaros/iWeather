@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.guohui.weather.db.WeatherDbHelper;
 
@@ -21,12 +22,13 @@ public class DbUtil {
     }
 
     public boolean addCityWeather(String city, String weather) {
-        boolean result = true;
+        boolean result = false;
         if (!contains(city)) {
             ContentValues cv = new ContentValues();
             cv.put("city", city);
             cv.put("weather_msg", weather);
             result = db.insert("weather", null, cv) != -1 ? true : false;
+            Log.e("dbAdd","数据库增加"+city+"-"+result+"-"+weather.length());
         }
         return result;
     }
@@ -38,8 +40,12 @@ public class DbUtil {
 
     public boolean updateCityWeather(String city,String message) {
         //修改SQL语句
-        String sql = "update weather set weather_msg = "+message+" where city = "+city;
-        db.execSQL(sql);
+        if (contains(city)) {
+            Log.e("dbUpdate","数据库更新");
+            ContentValues values = new ContentValues();
+            values.put("weather_msg",message);
+            db.update("weather",values,"city=?",new String[]{city});
+        }
         return true;
     }
 
@@ -59,10 +65,13 @@ public class DbUtil {
         String result = null;
         Cursor cursor = db.query("weather", null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
-            String c = cursor.getString(cursor.getColumnIndex("city"));
-            if (c.equals(city)) {
-                result = cursor.getString(cursor.getColumnIndex("weather_msg"));
-            }
+            do {
+                String c = cursor.getString(cursor.getColumnIndex("city"));
+                Log.e("查找城市", city);
+                if (c.equals(city)) {
+                    result = cursor.getString(cursor.getColumnIndex("weather_msg"));
+                }
+            }while (cursor.moveToNext());
         }
 
         return result;
