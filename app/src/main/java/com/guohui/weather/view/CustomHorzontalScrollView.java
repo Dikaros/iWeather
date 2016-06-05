@@ -2,6 +2,7 @@ package com.guohui.weather.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.HorizontalScrollView;
 
@@ -22,9 +23,16 @@ public class CustomHorzontalScrollView extends HorizontalScrollView {
         super(context, attrs, defStyleAttr);
     }
 
+
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        if (ev.getAction()==MotionEvent.ACTION_MOVE){
+            getParent().getParent().getParent().getParent().requestDisallowInterceptTouchEvent(true);
+        }
         super.onTouchEvent(ev);
+
         return true;
     }
+
+
 }

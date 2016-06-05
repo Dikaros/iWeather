@@ -54,4 +54,38 @@ public class Config {
     public static String KEY_REGISTED_WEATHER = "iweather.register";
 
     public static String KEY_REMEMBERED_WEATHER ="iweather.weather";
+
+    /**
+     * 获取天气图片
+     * @param weatherCode
+     * @param little
+     * @return
+     */
+    public static int getWeatherImage(int weatherCode,boolean little){
+
+//            switch (weatherCode){
+//                case 100:
+//                    return little?R.drawable.sunny_d_s:R.drawable.sunny_d;
+//                case 101:
+//                case 102:
+//                case 103:
+//                case 104:
+//            }
+        if (weatherCode>=300&&weatherCode<=313)
+            return little?R.drawable.rain_s:R.drawable.rain;
+
+        if (weatherCode>100&&weatherCode<=103)
+            return little?R.drawable.clouds_s:R.drawable.clouds_s;
+
+        if (weatherCode==100)
+            return little?R.drawable.sunny_d_s:R.drawable.sunny_d;
+
+        if (weatherCode>=400&&weatherCode<=407)
+            return little?R.drawable.snow_s:R.drawable.snow_d;
+
+        if (weatherCode==104)
+            return little?R.drawable.clody_n_s:R.drawable.clody_n;
+
+        return little?R.drawable.sunny_d_s:R.drawable.sunny_d;
+    }
 }

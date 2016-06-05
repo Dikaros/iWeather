@@ -40,8 +40,9 @@ public class CitySimpleView {
         this.onViewClickListener = onViewClickListener;
     }
 
-    public CitySimpleView(final Context context, final int index, String city, String updateTime, String tmp) {
+    public CitySimpleView(final Context context, final int index, String city, String updateTime, String tmp,int resoure) {
         view = LayoutInflater.from(context).inflate(R.layout.simple_city_item_view, null);
+        view.setBackgroundResource(resoure);
         SimpifyUtil.findAllViews(this, view);
         tvCityName.setText(city);
         tvCurrentTmp.setText(tmp);

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -46,9 +47,11 @@ public class CityActivity extends AppCompatActivity {
         });
 
         for (int i:Config.currentCityMap.keySet()){
+            final int j = i;
             Weather weather = Config.currentCityMap.get(i);
             String time = weather.getHourly_forecast().get(0).getDate();
-            CitySimpleView view = new CitySimpleView(this,i,weather.getBasic().getCity(),time.substring(time.length()-5,time.length()),weather.getHourly_forecast().get(0).getTmp()+"°");
+
+            CitySimpleView view = new CitySimpleView(this,i,weather.getBasic().getCity(),time.substring(time.length()-5,time.length()),weather.getHourly_forecast().get(0).getTmp()+"°",Config.getWeatherImage(Integer.parseInt(weather.getDaily_forecast().get(0).getCond().getCode_d()),true));
             llCityList.addView(view.getView());
             view.setOnViewClickListener(new CitySimpleView.OnViewClickListener() {
                 @Override

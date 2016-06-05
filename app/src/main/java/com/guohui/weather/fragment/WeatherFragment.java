@@ -24,6 +24,7 @@ import com.dikaros.asynet.NormalAsyNet;
 import com.dikaros.simplifyfindwidget.SimpifyUtil;
 import com.dikaros.simplifyfindwidget.annotation.FindView;
 import com.guohui.weather.Config;
+import com.guohui.weather.MainActivity;
 import com.guohui.weather.R;
 import com.guohui.weather.bean.CondIcons;
 import com.guohui.weather.bean.DailyForecast;
@@ -38,6 +39,10 @@ import com.guohui.weather.view.HourlyForecastView;
 import com.guohui.weather.view.InnerScrollView;
 import com.guohui.weather.view.LineView;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -255,8 +260,6 @@ public class WeatherFragment extends Fragment {
         } else {
             updateWeatherFromNet();
         }
-
-
         return v;
     }
 
@@ -268,7 +271,6 @@ public class WeatherFragment extends Fragment {
                 @Override
                 public void run() {
                     currentWeather = new Weather(we);
-
                     handler.sendEmptyMessage(1);
                 }
 
@@ -351,6 +353,7 @@ public class WeatherFragment extends Fragment {
             public void whenException() {
                 refreshing = false;
             }
+
 
             @Override
             public void onProgress(Integer progress) {
@@ -439,14 +442,22 @@ public class WeatherFragment extends Fragment {
         //空气质量
         tvDetailAirq.setText(currentWeather.getAqi().getQlty());
 
-
+        int i = Config.getWeatherImage(Integer.parseInt(currentWeather.getDaily_forecast().get(0).getCond().getCode_d()),false);
+//        currentBackgroundId = i;
+//        getView().setBackgroundResource(i);
+        ((MainActivity)getActivity()).addImage(index,i);
+        ((MainActivity)getActivity()).showImage();
     }
+
+//    public int currentBackgroundId = 0;
 
 
     private void initWeatherForecast() {
 
         llWeatherHourly.removeAllViews();
         llWeatherForcast.removeAllViews();
+
+
 
         if (currentWeather == null) {
 
@@ -512,7 +523,6 @@ public class WeatherFragment extends Fragment {
             }
 
         }
-
 
     }
 
