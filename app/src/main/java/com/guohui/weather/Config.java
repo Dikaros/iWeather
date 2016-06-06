@@ -75,7 +75,7 @@ public class Config {
             return little?R.drawable.rain_s:R.drawable.rain;
 
         if (weatherCode>100&&weatherCode<=103)
-            return little?R.drawable.clouds_s:R.drawable.clouds_s;
+            return little?R.drawable.clouds_s:R.drawable.clouds_d;
 
         if (weatherCode==100)
             return little?R.drawable.sunny_d_s:R.drawable.sunny_d;
